@@ -1,7 +1,9 @@
 package com.kbtu.oop.project;
 
+import com.kbtu.oop.project.ui.console.ConsoleApp;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        new ConsoleApp().start(args);
     }
 }
