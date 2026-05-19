@@ -26,4 +26,7 @@ public class Course extends BaseEntity {
     private CourseType courseType = CourseType.MAJOR;
     private List<UUID> instructorIds = new ArrayList<>();
     private List<UUID> studentIds = new ArrayList<>();
+    private int requiredLectures;
+    private int requiredLabs;
+    private int requiredPractices;
 }

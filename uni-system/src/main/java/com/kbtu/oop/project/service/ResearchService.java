@@ -35,6 +35,7 @@ import com.kbtu.oop.project.util.I18n;
 import java.util.Comparator;
 import java.util.List;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class ResearchService {
@@ -108,6 +109,7 @@ public class ResearchService {
         ResearchPaper saved = researchRepository.save(paper);
         researcher.getResearchPaperIds().add(saved.getId());
         saveResearcher(researcherId, researcher);
+        addToGraduateDiplomaPapersIfNeeded(researcherId, saved.getId());
 
         notifyJournalSubscribers(journal, saved);
         newsService.announcePublishedPaper(researcherId, saved.getId());
@@ -173,19 +175,7 @@ public class ResearchService {
             throw new ResearchSupervisorException(I18n.get("errors.supervisorOnlyForGraduateStudents"));
         }
 
-        User supervisorCandidate = userRepository.findById(supervisorId)
-                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.supervisorNotFoundById", supervisorId)));
-        if (!(supervisorCandidate instanceof Teacher teacher)) {
-            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
-        }
-        if (teacher.getPosition() != TeacherPosition.PROFESSOR) {
-            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
-        }
-
         Researcher researcher = resolveResearcher(supervisorId);
-        if (!(researcher instanceof Teacher)) {
-            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
-        }
         List<ResearchPaper> supervisorPapers = resolveResearchPapers(researcher);
         if (researcher.calculateHIndex(supervisorPapers) < 3) {
             throw new ResearchSupervisorException(I18n.get("errors.supervisorHIndexMin"));
@@ -211,17 +201,35 @@ public class ResearchService {
         return printAllPapers(PaperSortStrategyFactory.create(paperSortType));
     }
 
+    public List<ResearchPaper> findResearcherPapers(UUID researcherId) {
+        Researcher researcher = resolveResearcher(researcherId);
+        return resolveResearchPapers(researcher);
+    }
+
     public List<ResearchProject> findAllProjects() {
         return researchProjectRepository.findAll();
     }
 
     public ResearchProject createProject(UUID researcherId, ResearchProject project) {
+        resolveResearcher(researcherId);
         if (!project.getParticipantIds().contains(researcherId)) {
             project.getParticipantIds().add(researcherId);
         }
         ResearchProject saved = researchProjectRepository.save(project);
         actionLogger.log(researcherId, "CREATE_RESEARCH_PROJECT", "Created project " + saved.getId());
         return saved;
+    }
+
+    public List<ResearchProject> findProjectsByParticipant(UUID researcherId) {
+        return researchProjectRepository.findAll().stream()
+                .filter(project -> project.getParticipantIds().contains(researcherId))
+                .toList();
+    }
+
+    public List<ResearchProject> findProjectsAvailableForResearcher(UUID researcherId) {
+        return researchProjectRepository.findAll().stream()
+                .filter(project -> !project.getParticipantIds().contains(researcherId))
+                .toList();
     }
 
     public void joinProject(UUID researcherId, UUID projectId) {
@@ -349,5 +357,22 @@ public class ResearchService {
         if (!(user instanceof Manager)) {
             throw new ResearchProjectException("Only manager can perform this action");
         }
+    }
+
+    private void addToGraduateDiplomaPapersIfNeeded(UUID researcherId, UUID paperId) {
+        userRepository.findById(researcherId).ifPresent(user -> {
+            if (!(user instanceof GraduateStudent graduateStudent)) {
+                return;
+            }
+            List<UUID> diplomaPaperIds = graduateStudent.getDiplomaProjectPaperIds();
+            if (diplomaPaperIds == null) {
+                diplomaPaperIds = new ArrayList<>();
+                graduateStudent.setDiplomaProjectPaperIds(diplomaPaperIds);
+            }
+            if (!diplomaPaperIds.contains(paperId)) {
+                diplomaPaperIds.add(paperId);
+                userRepository.save(graduateStudent);
+            }
+        });
     }
 }

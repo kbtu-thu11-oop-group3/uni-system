@@ -10,6 +10,7 @@ import com.kbtu.oop.project.ui.app.panels.MessagesPanel;
 import com.kbtu.oop.project.ui.app.panels.NewsPanel;
 import com.kbtu.oop.project.ui.app.panels.StudentsPanel;
 import com.kbtu.oop.project.ui.app.panels.ResearchPanel;
+import com.kbtu.oop.project.ui.app.panels.TeacherLessonsPanel;
 import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ public class TeacherPanel extends JPanel {
         tabs.addTab("", new NewsPanel(context.newsService, context.researchService, teacher.getId()));
         tabs.addTab("", new MessagesPanel(context.messageService, teacher.getId()));
         tabs.addTab("", new EmployeeSupportRequestsPanel(context.supportRequestService, teacher.getId()));
+        tabs.addTab("", new TeacherLessonsPanel(context.scheduleService, teacher.getId()));
 
         if (showResearchTab) {
             tabs.addTab("", new ResearchPanel(context.researchService, teacher.getId()));
@@ -51,8 +53,9 @@ public class TeacherPanel extends JPanel {
         tabs.setTitleAt(4, I18n.get("tab.news"));
         tabs.setTitleAt(5, I18n.get("tab.messages"));
         tabs.setTitleAt(6, I18n.get("tab.supportRequests"));
+        tabs.setTitleAt(7, I18n.get("tab.lessons"));
         if (showResearchTab) {
-            tabs.setTitleAt(7, I18n.get("tab.research"));
+            tabs.setTitleAt(8, I18n.get("tab.research"));
         }
     }
 }

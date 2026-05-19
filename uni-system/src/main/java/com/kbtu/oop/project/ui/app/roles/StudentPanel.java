@@ -8,6 +8,7 @@ import com.kbtu.oop.project.ui.app.panels.StudentCoursesPanel;
 import com.kbtu.oop.project.ui.app.panels.StudentTeachersPanel;
 import com.kbtu.oop.project.ui.app.panels.StudentTranscriptPanel;
 import com.kbtu.oop.project.ui.app.panels.ResearchPanel;
+import com.kbtu.oop.project.ui.app.panels.StudentLessonsPanel;
 import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JPanel;
@@ -39,6 +40,7 @@ public class StudentPanel extends JPanel {
             new StudentTranscriptPanel(context.gradeService, context.courseService, student.getId()));
         tabs.addTab("", new OrganizationsPanel(context.studentOrganizationService, student.getId()));
         tabs.addTab("", new NewsPanel(context.newsService, context.researchService, student.getId()));
+        tabs.addTab("", new StudentLessonsPanel(context.scheduleService, context.courseService, student.getId()));
 
         // Research tab for graduates and eligible researchers
         if (showResearchTab) {
@@ -56,8 +58,9 @@ public class StudentPanel extends JPanel {
         tabs.setTitleAt(2, I18n.get("tab.transcript"));
         tabs.setTitleAt(3, I18n.get("tab.organizations"));
         tabs.setTitleAt(4, I18n.get("tab.news"));
+        tabs.setTitleAt(5, I18n.get("tab.lessons"));
         if (showResearchTab) {
-            tabs.setTitleAt(5, I18n.get("tab.research"));
+            tabs.setTitleAt(6, I18n.get("tab.research"));
         }
     }
 }

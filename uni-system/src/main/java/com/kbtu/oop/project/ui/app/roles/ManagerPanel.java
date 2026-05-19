@@ -12,6 +12,7 @@ import com.kbtu.oop.project.ui.app.panels.NewsPanel;
 import com.kbtu.oop.project.ui.app.panels.OrganizationsManagementPanel;
 import com.kbtu.oop.project.ui.app.panels.ReportsPanel;
 import com.kbtu.oop.project.ui.app.panels.ResearchJournalsManagementPanel;
+import com.kbtu.oop.project.ui.app.panels.LessonsManagementPanel;
 import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JPanel;
@@ -36,6 +37,8 @@ public class ManagerPanel extends JPanel {
         tabs.addTab("", new MessagesPanel(context.messageService, manager.getId()));
         tabs.addTab("", new EmployeeSupportRequestsPanel(context.supportRequestService, manager.getId()));
         tabs.addTab("", new ResearchJournalsManagementPanel(context.researchService, manager.getId()));
+        tabs.addTab("", new LessonsManagementPanel(context.scheduleService, context.courseService, context.userService,
+                manager.getId()));
         applyTranslations();
         I18n.addListener(this::applyTranslations);
 
@@ -53,5 +56,6 @@ public class ManagerPanel extends JPanel {
         tabs.setTitleAt(7, I18n.get("tab.messages"));
         tabs.setTitleAt(8, I18n.get("tab.supportRequests"));
         tabs.setTitleAt(9, I18n.get("tab.journals"));
+        tabs.setTitleAt(10, I18n.get("tab.lessons"));
     }
 }

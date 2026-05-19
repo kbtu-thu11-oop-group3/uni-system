@@ -12,6 +12,7 @@ import com.kbtu.oop.project.service.SupportRequestService;
 import com.kbtu.oop.project.service.TranscriptService;
 import com.kbtu.oop.project.service.UserService;
 import com.kbtu.oop.project.service.ResearchService;
+import com.kbtu.oop.project.service.ScheduleService;
 
 public class UiContext {
 
@@ -27,4 +28,5 @@ public class UiContext {
     public final ComplaintService complaintService = new ComplaintService();
     public final TranscriptService transcriptService = new TranscriptService();
     public final StudentOrganizationService studentOrganizationService = new StudentOrganizationService();
+    public final ScheduleService scheduleService = new ScheduleService();
 }

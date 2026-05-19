@@ -94,6 +94,36 @@ public class CoursesPanel extends JPanel {
                         .editable(editable)
                         .alignment(SwingConstants.CENTER)
                         .width(120)
+                        .build(),
+
+                Column.<Course, Integer>builder()
+                        .name(I18n.get("col.lectures"))
+                        .type(Integer.class)
+                        .getter(Course::getRequiredLectures)
+                        .setter(Course::setRequiredLectures)
+                        .editable(editable)
+                        .alignment(SwingConstants.CENTER)
+                        .width(90)
+                        .build(),
+
+                Column.<Course, Integer>builder()
+                        .name(I18n.get("col.labs"))
+                        .type(Integer.class)
+                        .getter(Course::getRequiredLabs)
+                        .setter(Course::setRequiredLabs)
+                        .editable(editable)
+                        .alignment(SwingConstants.CENTER)
+                        .width(90)
+                        .build(),
+
+                Column.<Course, Integer>builder()
+                        .name(I18n.get("col.practices"))
+                        .type(Integer.class)
+                        .getter(Course::getRequiredPractices)
+                        .setter(Course::setRequiredPractices)
+                        .editable(editable)
+                        .alignment(SwingConstants.CENTER)
+                        .width(100)
                         .build()));
         this.table = new JTable(model);
         model.configureTable(table);
@@ -166,6 +196,9 @@ public class CoursesPanel extends JPanel {
         course.setDescription("");
         course.setCredits(3);
         course.setCourseType(CourseType.MAJOR);
+        course.setRequiredLectures(0);
+        course.setRequiredLabs(0);
+        course.setRequiredPractices(0);
         try {
             managerService.addCourseForRegistration(managerId, course);
             refresh();

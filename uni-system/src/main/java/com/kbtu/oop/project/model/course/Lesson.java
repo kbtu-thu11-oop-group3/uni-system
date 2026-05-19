@@ -10,6 +10,8 @@ import lombok.ToString;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -26,4 +28,6 @@ public class Lesson extends BaseEntity {
     private LocalTime startTime;
     private LocalTime endTime;
     private String room;
+    private int capacity;
+    private List<UUID> enrolledStudentIds = new ArrayList<>();
 }

@@ -69,4 +69,16 @@ public final class DataPaths {
     public static Path studentOrganizationsPath() {
         return DATA_DIR.resolve("student-organizations.json");
     }
+
+    public static Path lessonsPath() {
+        return DATA_DIR.resolve("lessons.json");
+    }
+
+    public static Path schedulesPath() {
+        return DATA_DIR.resolve("schedules.json");
+    }
+
+    public static Path lessonJournalPath() {
+        return DATA_DIR.resolve("lesson-journal.json");
+    }
 }

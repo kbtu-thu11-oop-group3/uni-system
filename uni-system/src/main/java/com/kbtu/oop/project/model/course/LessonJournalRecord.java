@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -16,9 +15,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Schedule extends BaseEntity {
+public class LessonJournalRecord extends BaseEntity {
 
-    private UUID userId;
+    private UUID lessonId;
     private UUID courseId;
-    private List<UUID> lessonIds = new ArrayList<>();
+    private UUID teacherId;
+    private UUID studentId;
+    private LocalDate lessonDate = LocalDate.now();
+    private Double score;
+    private Boolean present;
+    private String comment;
 }
