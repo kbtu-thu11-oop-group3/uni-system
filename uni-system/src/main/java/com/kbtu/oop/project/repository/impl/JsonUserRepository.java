@@ -1,6 +1,7 @@
 package com.kbtu.oop.project.repository.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.kbtu.oop.project.model.common.Language;
 import com.kbtu.oop.project.model.user.Admin;
 import com.kbtu.oop.project.model.user.GraduateStudent;
 import com.kbtu.oop.project.model.user.Manager;
@@ -74,6 +75,14 @@ public class JsonUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return findAll().stream()
+                .filter(user -> user.getUsername() != null)
+                .filter(user -> user.getUsername().equalsIgnoreCase(username))
+                .findFirst();
+    }
+
+    @Override
     public Optional<User> findByEmail(String email) {
         return findAll().stream()
                 .filter(user -> user.getEmail() != null)
@@ -107,6 +116,17 @@ public class JsonUserRepository implements UserRepository {
                     t.getResearchPaperIds().add(UUID.fromString(idNode.asText()));
                 }
             }
+            if (node.has("courseIds")) {
+                for (JsonNode idNode : node.get("courseIds")) {
+                    t.getCourseIds().add(UUID.fromString(idNode.asText()));
+                }
+            }
+            if (node.hasNonNull("averageRating")) {
+                t.setAverageRating(node.get("averageRating").asDouble());
+            }
+            if (node.hasNonNull("ratingCount")) {
+                t.setRatingCount(node.get("ratingCount").asInt());
+            }
             user = t;
         } else if (node.has("requestIds")) {
             TechSupportSpecialist s = new TechSupportSpecialist();
@@ -122,6 +142,15 @@ public class JsonUserRepository implements UserRepository {
         } else if (node.has("supervisorId") || node.has("diplomaProjectPaperIds")) {
             GraduateStudent g = new GraduateStudent();
             setCommonFields(g, node);
+            if (node.hasNonNull("studentType")) {
+                g.setStudentType(
+                        com.kbtu.oop.project.model.common.StudentType.valueOf(node.get("studentType").asText()));
+            }
+            if (node.has("enrolledCourseIds")) {
+                for (JsonNode idNode : node.get("enrolledCourseIds")) {
+                    g.getEnrolledCourseIds().add(UUID.fromString(idNode.asText()));
+                }
+            }
             if (node.hasNonNull("supervisorId")) {
                 g.setSupervisorId(UUID.fromString(node.get("supervisorId").asText()));
             }
@@ -139,8 +168,20 @@ public class JsonUserRepository implements UserRepository {
         } else if (node.hasNonNull("studentCode")) {
             Student s = new Student();
             setCommonFields(s, node);
+            if (node.hasNonNull("studentType")) {
+                s.setStudentType(
+                        com.kbtu.oop.project.model.common.StudentType.valueOf(node.get("studentType").asText()));
+            }
             s.setStudentCode(getText(node, "studentCode"));
-            s.setMajor(getText(node, "major"));
+            if (node.hasNonNull("school")) {
+                s.setSchool(com.kbtu.oop.project.model.common.School.valueOf(node.get("school").asText()));
+            } else if (node.hasNonNull("major")) {
+                try {
+                    s.setSchool(com.kbtu.oop.project.model.common.School.valueOf(node.get("major").asText().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    s.setSchool(com.kbtu.oop.project.model.common.School.SEPI);
+                }
+            }
             if (node.hasNonNull("yearOfStudy"))
                 s.setYearOfStudy(node.get("yearOfStudy").asInt());
             if (node.hasNonNull("credits"))
@@ -149,6 +190,11 @@ public class JsonUserRepository implements UserRepository {
                 s.setGpa(node.get("gpa").asDouble());
             if (node.hasNonNull("failedAttempts"))
                 s.setFailedAttempts(node.get("failedAttempts").asInt());
+            if (node.has("enrolledCourseIds")) {
+                for (JsonNode idNode : node.get("enrolledCourseIds")) {
+                    s.getEnrolledCourseIds().add(UUID.fromString(idNode.asText()));
+                }
+            }
             user = s;
         } else if (node.hasNonNull("employeeCode")) {
             Admin a = new Admin();
@@ -166,17 +212,24 @@ public class JsonUserRepository implements UserRepository {
     }
 
     private void setCommonFields(User user, JsonNode node) {
-        if (node.hasNonNull("id")) {
+        if (node.hasNonNull("id"))
             user.setId(UUID.fromString(node.get("id").asText()));
-        }
-        if (node.hasNonNull("fullName"))
-            user.setFullName(node.get("fullName").asText());
+        if (node.hasNonNull("username"))
+            user.setUsername(node.get("username").asText());
+        if (node.hasNonNull("firstName"))
+            user.setFirstName(node.get("firstName").asText());
+        if (node.hasNonNull("middleName"))
+            user.setMiddleName(node.get("middleName").asText());
+        if (node.hasNonNull("lastName"))
+            user.setLastName(node.get("lastName").asText());
         if (node.hasNonNull("email"))
             user.setEmail(node.get("email").asText());
+        if (user.getUsername() == null && user.getEmail() != null)
+            user.setUsername(user.getEmail());
         if (node.hasNonNull("passwordHash"))
             user.setPasswordHash(node.get("passwordHash").asText());
         if (node.hasNonNull("language"))
-            user.setLanguage(com.kbtu.oop.project.model.common.Language.valueOf(node.get("language").asText()));
+            user.setLanguage(Language.valueOf(node.get("language").asText()));
         if (node.hasNonNull("active"))
             user.setActive(node.get("active").asBoolean());
     }

@@ -1,5 +1,6 @@
 package com.kbtu.oop.project.model.grade;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kbtu.oop.project.model.common.BaseEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,12 +21,19 @@ public class Mark extends BaseEntity {
     private UUID courseId;
     private UUID teacherId;
 
-    private double firstAttestation;
-    private double secondAttestation;
-    private double finalExam;
+    private Double firstAttestation;
+    private Double secondAttestation;
+    private Double finalExam;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     public double getTotal() {
-        return firstAttestation + secondAttestation + finalExam;
+        return (firstAttestation != null ? firstAttestation : 0) + 
+               (secondAttestation != null ? secondAttestation : 0) + 
+               (finalExam != null ? finalExam : 0);
+    }
+
+    @JsonIgnore
+    public boolean isComplete() {
+        return firstAttestation != null && secondAttestation != null && finalExam != null;
     }
 }

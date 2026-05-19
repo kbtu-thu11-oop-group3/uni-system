@@ -7,6 +7,5 @@ public final class Menu {
 
     public static void showWelcome() {
         System.out.println("University system initialized.");
-        System.out.println("Modes: default (seed+demo), seed, demo");
     }
 }

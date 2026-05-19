@@ -11,6 +11,7 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,16 +22,18 @@ public class ResearchPaper extends BaseEntity implements Comparable<ResearchPape
 
     private String title;
     private List<String> authors = new ArrayList<>();
-    private String journal;
+    private UUID journalId;
     private int pages;
     private LocalDate publicationDate;
     private String doi;
     private int citations;
 
     public String getCitation(ResearchPaperFormat format) {
+        String year = publicationDate != null ? String.valueOf(publicationDate.getYear()) : "N/A";
         return switch (format) {
             case BIBTEX -> "@article{" + doi + ", title={" + title + "}}";
-            case PLAIN_TEXT -> String.join(", ", authors) + ". " + title + ". " + journal;
+            case PLAIN_TEXT ->
+                String.join(", ", authors) + ". " + title + ". " + year + ". DOI: " + doi;
         };
     }
 

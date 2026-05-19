@@ -4,6 +4,8 @@ import com.kbtu.oop.project.exception.NotFoundException;
 import com.kbtu.oop.project.exception.ValidationException;
 import com.kbtu.oop.project.model.common.UrgencyLevel;
 import com.kbtu.oop.project.model.request.Complaint;
+import com.kbtu.oop.project.model.common.RequestStatus;
+import com.kbtu.oop.project.model.user.Manager;
 import com.kbtu.oop.project.model.user.Teacher;
 import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.repository.ComplaintRepository;
@@ -50,5 +52,40 @@ public class ComplaintService {
         Complaint saved = complaintRepository.save(complaint);
         actionLogger.log(teacherId, "SEND_COMPLAINT", "Sent complaint " + saved.getId());
         return saved;
+    }
+
+    public List<Complaint> listAll(UUID managerId) {
+        ensureManager(managerId);
+        return complaintRepository.findAll();
+    }
+
+    public Complaint updateStatus(UUID managerId, UUID complaintId, RequestStatus status) {
+        ensureManager(managerId);
+        Complaint complaint = complaintRepository.findById(complaintId)
+                .orElseThrow(() -> new NotFoundException("Complaint not found: " + complaintId));
+        complaint.setStatus(status);
+        Complaint saved = complaintRepository.save(complaint);
+        actionLogger.log(managerId, "UPDATE_COMPLAINT", "Updated complaint " + complaintId + " to " + status);
+        return saved;
+    }
+
+    public List<Complaint> listByTeacher(UUID teacherId) {
+        User teacherCandidate = userRepository.findById(teacherId)
+                .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+        if (!(teacherCandidate instanceof Teacher)) {
+            throw new ValidationException("Only teacher can view complaints");
+        }
+
+        return complaintRepository.findAll().stream()
+                .filter(complaint -> teacherId.equals(complaint.getSenderTeacherId()))
+                .toList();
+    }
+
+    private void ensureManager(UUID managerId) {
+        User user = userRepository.findById(managerId)
+                .orElseThrow(() -> new NotFoundException("Manager not found: " + managerId));
+        if (!(user instanceof Manager)) {
+            throw new ValidationException("Only manager can perform this action");
+        }
     }
 }

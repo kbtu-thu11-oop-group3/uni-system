@@ -34,6 +34,14 @@ public final class DataPaths {
         return DATA_DIR.resolve("research-projects.json");
     }
 
+    public static Path researchJournalsPath() {
+        return DATA_DIR.resolve("research-journals.json");
+    }
+
+    public static Path researcherProfilesPath() {
+        return DATA_DIR.resolve("researcher-profiles.json");
+    }
+
     public static Path newsPath() {
         return DATA_DIR.resolve("news.json");
     }
@@ -56,5 +64,9 @@ public final class DataPaths {
 
     public static Path newsCommentsPath() {
         return DATA_DIR.resolve("news-comments.json");
+    }
+
+    public static Path studentOrganizationsPath() {
+        return DATA_DIR.resolve("student-organizations.json");
     }
 }

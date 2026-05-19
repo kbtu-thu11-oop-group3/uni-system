@@ -4,14 +4,17 @@ import com.kbtu.oop.project.exception.NotFoundException;
 import com.kbtu.oop.project.exception.ValidationException;
 import com.kbtu.oop.project.model.course.Course;
 import com.kbtu.oop.project.model.course.Enrollment;
+import com.kbtu.oop.project.model.grade.Mark;
 import com.kbtu.oop.project.model.user.Manager;
 import com.kbtu.oop.project.model.user.Teacher;
 import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.repository.CourseRepository;
 import com.kbtu.oop.project.repository.EnrollmentRepository;
+import com.kbtu.oop.project.repository.GradeRepository;
 import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonCourseRepository;
 import com.kbtu.oop.project.repository.impl.JsonEnrollmentRepository;
+import com.kbtu.oop.project.repository.impl.JsonGradeRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
 
@@ -22,20 +25,23 @@ public class ManagerService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final GradeRepository gradeRepository;
     private final ActionLogger actionLogger;
 
     public ManagerService() {
-        this(new JsonUserRepository(), new JsonCourseRepository(), new JsonEnrollmentRepository(),
-                ActionLogger.getInstance());
+        this(new JsonUserRepository(), new JsonCourseRepository(), new JsonEnrollmentRepository(), 
+                new JsonGradeRepository(), ActionLogger.getInstance());
     }
 
     public ManagerService(UserRepository userRepository,
             CourseRepository courseRepository,
             EnrollmentRepository enrollmentRepository,
+            GradeRepository gradeRepository,
             ActionLogger actionLogger) {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.gradeRepository = gradeRepository;
         this.actionLogger = actionLogger;
     }
 
@@ -44,6 +50,19 @@ public class ManagerService {
         Course saved = courseRepository.save(course);
         actionLogger.log(managerId, "ADD_COURSE", "Added course " + saved.getId());
         return saved;
+    }
+
+    public Course updateCourse(UUID managerId, Course course) {
+        ensureManager(managerId);
+        Course saved = courseRepository.save(course);
+        actionLogger.log(managerId, "UPDATE_COURSE", "Updated course " + saved.getId());
+        return saved;
+    }
+
+    public void deleteCourse(UUID managerId, UUID courseId) {
+        ensureManager(managerId);
+        courseRepository.deleteById(courseId);
+        actionLogger.log(managerId, "DELETE_COURSE", "Deleted course " + courseId);
     }
 
     public void assignCourseToTeacher(UUID managerId, UUID courseId, UUID teacherId) {
@@ -74,7 +93,24 @@ public class ManagerService {
                 .orElseThrow(() -> new NotFoundException("Enrollment not found: " + enrollmentId));
         enrollment.setStatus(com.kbtu.oop.project.model.common.RequestStatus.ACCEPTED);
         Enrollment saved = enrollmentRepository.save(enrollment);
+        
+        // Create mark with null values for attestations
+        Mark mark = new Mark();
+        mark.setStudentId(enrollment.getStudentId());
+        mark.setCourseId(enrollment.getCourseId());
+        gradeRepository.save(mark);
+        
         actionLogger.log(managerId, "APPROVE_REGISTRATION", "Approved enrollment " + enrollmentId);
+        return saved;
+    }
+
+    public Enrollment rejectRegistration(UUID managerId, UUID enrollmentId) {
+        ensureManager(managerId);
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new NotFoundException("Enrollment not found: " + enrollmentId));
+        enrollment.setStatus(com.kbtu.oop.project.model.common.RequestStatus.REJECTED);
+        Enrollment saved = enrollmentRepository.save(enrollment);
+        actionLogger.log(managerId, "REJECT_REGISTRATION", "Rejected enrollment " + enrollmentId);
         return saved;
     }
 

@@ -56,4 +56,20 @@ public class MessageService {
                 .filter(message -> userId.equals(message.getRecipientId()))
                 .toList();
     }
+
+    public List<Message> outbox(UUID userId) {
+        return messageRepository.findAll().stream()
+                .filter(message -> userId.equals(message.getSenderId()))
+                .toList();
+    }
+
+    public Message markRead(UUID userId, UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message not found: " + messageId));
+        if (!userId.equals(message.getRecipientId())) {
+            throw new ValidationException("Only recipient can mark message as read");
+        }
+        message.setRead(true);
+        return messageRepository.save(message);
+    }
 }

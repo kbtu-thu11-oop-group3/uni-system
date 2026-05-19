@@ -51,10 +51,18 @@ public class UserService {
         return saved;
     }
 
+    public User updateUser(User user) {
+        User saved = userRepository.save(user);
+        actionLogger.log(user.getId(), "UPDATE_PROFILE", "Updated own profile");
+        return saved;
+    }
+
     public void removeUser(UUID adminId, UUID userId) {
         ensureAdmin(adminId);
-        userRepository.deleteById(userId);
-        actionLogger.log(adminId, "REMOVE_USER", "Removed user " + userId);
+        User user = findById(userId);
+        user.setActive(false);
+        userRepository.save(user);
+        actionLogger.log(adminId, "REMOVE_USER", "Deactivated user " + userId);
     }
 
     public User updateLanguage(UUID userId, Language language) {

@@ -5,6 +5,7 @@ import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +24,9 @@ public class AuthService {
         this.actionLogger = actionLogger;
     }
 
-    public User login(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        User user = userOptional.orElseThrow(() -> new AuthException("Invalid credentials"));
+    public User login(String username, String password) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        User user = userOptional.orElseThrow(() -> new AuthException(I18n.get("errors.invalidCredentials")));
 
         if (!user.isActive()) {
             throw new AuthException("User account is not active");

@@ -1,5 +1,6 @@
 package com.kbtu.oop.project.model.user;
 
+import com.kbtu.oop.project.model.common.School;
 import com.kbtu.oop.project.model.common.StudentType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class Student extends User {
 
     private String studentCode;
-    private String major;
+    private School school;
     private int yearOfStudy;
     private int credits;
     private double gpa;

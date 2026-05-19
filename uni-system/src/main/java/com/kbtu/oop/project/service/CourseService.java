@@ -49,6 +49,10 @@ public class CourseService {
                 .orElseThrow(() -> new NotFoundException("Course not found: " + id));
     }
 
+    public Course findCourseById(UUID id) {
+        return findById(id);
+    }
+
     public Enrollment registerForCourse(UUID studentId, UUID courseId) {
         User user = userRepository.findById(studentId)
                 .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));

@@ -1,5 +1,6 @@
 package com.kbtu.oop.project.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kbtu.oop.project.model.common.BaseEntity;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -26,9 +29,21 @@ import lombok.ToString;
 })
 public abstract class User extends BaseEntity {
 
-    private String fullName;
+    private String username;
+    private String firstName;
+    private String middleName;
+    private String lastName;
     private String email;
     private String passwordHash;
     private Language language = Language.EN;
     private boolean active = true;
+
+    @JsonIgnore
+    public String getFullName() {
+        return Arrays.asList(firstName, middleName, lastName)
+                .stream()
+                .filter(s -> s != null && !s.isBlank())
+                .reduce((a, b) -> a + " " + b)
+                .orElse("");
+    }
 }

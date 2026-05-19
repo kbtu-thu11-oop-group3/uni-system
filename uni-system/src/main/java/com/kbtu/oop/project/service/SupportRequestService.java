@@ -4,6 +4,7 @@ import com.kbtu.oop.project.exception.NotFoundException;
 import com.kbtu.oop.project.exception.ValidationException;
 import com.kbtu.oop.project.model.common.RequestStatus;
 import com.kbtu.oop.project.model.request.SupportRequest;
+import com.kbtu.oop.project.model.user.Employee;
 import com.kbtu.oop.project.model.user.TechSupportSpecialist;
 import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.repository.SupportRequestRepository;
@@ -35,8 +36,11 @@ public class SupportRequestService {
 
     public SupportRequest createRequest(UUID requesterId, String title, String description, String assetName,
             String location) {
-        userRepository.findById(requesterId)
-                .orElseThrow(() -> new NotFoundException("Requester not found: " + requesterId));
+        User requester = userRepository.findById(requesterId)
+            .orElseThrow(() -> new NotFoundException("Requester not found: " + requesterId));
+        if (!(requester instanceof Employee) || requester instanceof TechSupportSpecialist) {
+            throw new ValidationException("Only employees (excluding support) can create requests");
+        }
         SupportRequest request = new SupportRequest();
         request.setRequesterId(requesterId);
         request.setTitle(title);
@@ -46,6 +50,19 @@ public class SupportRequestService {
         SupportRequest saved = supportRequestRepository.save(request);
         actionLogger.log(requesterId, "CREATE_SUPPORT_REQUEST", "Created support request " + saved.getId());
         return saved;
+    }
+
+    public List<SupportRequest> listByRequester(UUID requesterId) {
+        userRepository.findById(requesterId)
+                .orElseThrow(() -> new NotFoundException("Requester not found: " + requesterId));
+        return supportRequestRepository.findAll().stream()
+                .filter(request -> requesterId.equals(request.getRequesterId()))
+                .toList();
+    }
+
+    public List<SupportRequest> listAll(UUID specialistId) {
+        ensureSpecialist(specialistId);
+        return supportRequestRepository.findAll();
     }
 
     public List<SupportRequest> listNewRequests(UUID specialistId) {

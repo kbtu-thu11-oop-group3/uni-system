@@ -2,9 +2,11 @@ package com.kbtu.oop.project.demo;
 
 import com.kbtu.oop.project.model.common.CourseType;
 import com.kbtu.oop.project.model.common.ManagerType;
+import com.kbtu.oop.project.model.common.School;
 import com.kbtu.oop.project.model.common.StudentType;
 import com.kbtu.oop.project.model.common.TeacherPosition;
 import com.kbtu.oop.project.model.course.Course;
+import com.kbtu.oop.project.model.research.ResearchJournal;
 import com.kbtu.oop.project.model.research.ResearchPaper;
 import com.kbtu.oop.project.model.user.Admin;
 import com.kbtu.oop.project.model.user.GraduateStudent;
@@ -26,6 +28,8 @@ public class SeedDataService {
         writeUsers();
         JsonUtil.writeCollection(DataPaths.coursesPath(), seedCourses());
         JsonUtil.writeCollection(DataPaths.researchPapersPath(), seedPapers());
+        JsonUtil.writeCollection(DataPaths.researchJournalsPath(), seedJournals());
+        JsonUtil.writeCollection(DataPaths.researcherProfilesPath(), new ArrayList<>());
 
         JsonUtil.writeCollection(DataPaths.gradesPath(), new ArrayList<>());
         JsonUtil.writeCollection(DataPaths.enrollmentsPath(), new ArrayList<>());
@@ -51,15 +55,17 @@ public class SeedDataService {
     private List<User> seedUsers() {
         Admin admin = new Admin();
         admin.setId(DemoIds.ADMIN_ID);
-        admin.setFullName("Aruzhan Admin");
-        admin.setEmail("admin@uni.local");
-        admin.setPasswordHash("admin123");
+        admin.setFirstName("System");
+        admin.setLastName("Admin");
+        admin.setEmail("admin");
+        admin.setPasswordHash("admin");
         admin.setDepartment("Administration");
         admin.setEmployeeCode("EMP-ADM-01");
 
         Manager manager = new Manager();
         manager.setId(DemoIds.MANAGER_ID);
-        manager.setFullName("Marat Manager");
+        manager.setFirstName("Marat");
+        manager.setLastName("Manager");
         manager.setEmail("manager@uni.local");
         manager.setPasswordHash("manager123");
         manager.setDepartment("OR Office");
@@ -68,7 +74,8 @@ public class SeedDataService {
 
         Teacher teacher = new Teacher();
         teacher.setId(DemoIds.TEACHER_ID);
-        teacher.setFullName("Talgat Professor");
+        teacher.setFirstName("Talgat");
+        teacher.setLastName("Professor");
         teacher.setEmail("teacher@uni.local");
         teacher.setPasswordHash("teacher123");
         teacher.setDepartment("SITE");
@@ -80,11 +87,12 @@ public class SeedDataService {
 
         Student student = new Student();
         student.setId(DemoIds.STUDENT_ID);
-        student.setFullName("Dana Student");
+        student.setFirstName("Dana");
+        student.setLastName("Student");
         student.setEmail("student@uni.local");
         student.setPasswordHash("student123");
         student.setStudentCode("STU-01");
-        student.setMajor("SITE");
+        student.setSchool(School.SITE);
         student.setYearOfStudy(2);
         student.setCredits(0);
         student.setGpa(3.2);
@@ -93,11 +101,12 @@ public class SeedDataService {
 
         GraduateStudent graduateStudent = new GraduateStudent();
         graduateStudent.setId(DemoIds.GRAD_STUDENT_ID);
-        graduateStudent.setFullName("Aigerim Graduate");
+        graduateStudent.setFirstName("Aigerim");
+        graduateStudent.setLastName("Graduate");
         graduateStudent.setEmail("grad@uni.local");
         graduateStudent.setPasswordHash("grad123");
         graduateStudent.setStudentCode("GRD-01");
-        graduateStudent.setMajor("CS");
+        graduateStudent.setSchool(School.SITE);
         graduateStudent.setYearOfStudy(1);
         graduateStudent.setCredits(0);
         graduateStudent.setGpa(3.8);
@@ -107,7 +116,8 @@ public class SeedDataService {
 
         TechSupportSpecialist support = new TechSupportSpecialist();
         support.setId(DemoIds.SUPPORT_ID);
-        support.setFullName("Ruslan Support");
+        support.setFirstName("Ruslan");
+        support.setLastName("Support");
         support.setEmail("support@uni.local");
         support.setPasswordHash("support123");
         support.setDepartment("IT Support");
@@ -169,5 +179,13 @@ public class SeedDataService {
         low.setCitations(3);
 
         return List.of(high, medium, low);
+    }
+
+    private List<ResearchJournal> seedJournals() {
+        ResearchJournal journal = new ResearchJournal();
+        journal.setName("KBTU Research Journal");
+        journal.setDescription("University research journal");
+        journal.setIssn("0000-0000");
+        return List.of(journal);
     }
 }
