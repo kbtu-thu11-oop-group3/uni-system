@@ -170,7 +170,8 @@ public class ResearchService {
 
     public void assignSupervisor(UUID graduateStudentId, UUID supervisorId) {
         User graduateCandidate = userRepository.findById(graduateStudentId)
-                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.graduateStudentNotFoundById", graduateStudentId)));
+                .orElseThrow(() -> new NotFoundException(
+                        I18n.getf("errors.graduateStudentNotFoundById", graduateStudentId)));
         if (!(graduateCandidate instanceof GraduateStudent graduateStudent)) {
             throw new ResearchSupervisorException(I18n.get("errors.supervisorOnlyForGraduateStudents"));
         }

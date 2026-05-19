@@ -103,7 +103,8 @@ public class ResearchPanel extends JPanel {
                 Column.<ResearchProject, String>builder()
                         .name(I18n.get("col.date"))
                         .type(String.class)
-                        .getter(p -> p.getStartDate() == null ? I18n.get("common.naShort") : p.getStartDate().toString())
+                        .getter(p -> p.getStartDate() == null ? I18n.get("common.naShort")
+                                : p.getStartDate().toString())
                         .width(120)
                         .build(),
                 Column.<ResearchProject, Integer>builder()
