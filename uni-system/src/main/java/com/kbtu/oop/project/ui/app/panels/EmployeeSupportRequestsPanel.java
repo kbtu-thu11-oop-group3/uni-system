@@ -6,6 +6,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,7 +32,7 @@ public class EmployeeSupportRequestsPanel extends JPanel {
         this.requesterId = requesterId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<SupportRequest, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(SupportRequest::getTitle)
                         .editable(false)
@@ -40,7 +41,7 @@ public class EmployeeSupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Description")
+                        .name(I18n.get("col.description"))
                         .type(String.class)
                         .getter(SupportRequest::getDescription)
                         .editable(false)
@@ -49,7 +50,7 @@ public class EmployeeSupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Asset")
+                        .name(I18n.get("col.asset"))
                         .type(String.class)
                         .getter(SupportRequest::getAssetName)
                         .editable(false)
@@ -58,7 +59,7 @@ public class EmployeeSupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Location")
+                        .name(I18n.get("col.location"))
                         .type(String.class)
                         .getter(SupportRequest::getLocation)
                         .editable(false)
@@ -67,7 +68,7 @@ public class EmployeeSupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(r -> r.getStatus().name())
                         .editable(false)
@@ -83,8 +84,8 @@ public class EmployeeSupportRequestsPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JButton createButton = new JButton("Create Request");
-        JButton refreshButton = new JButton("Refresh");
+        JButton createButton = new JButton(I18n.get("btn.createRequest"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         createButton.addActionListener(event -> createRequest());
         refreshButton.addActionListener(event -> refresh());
@@ -108,16 +109,16 @@ public class EmployeeSupportRequestsPanel extends JPanel {
         JTextField asset = new JTextField();
         JTextField location = new JTextField();
 
-        form.add(new JLabel("Title"));
+        form.add(new JLabel(I18n.get("col.title")));
         form.add(title);
-        form.add(new JLabel("Description"));
+        form.add(new JLabel(I18n.get("col.description")));
         form.add(description);
-        form.add(new JLabel("Asset"));
+        form.add(new JLabel(I18n.get("col.asset")));
         form.add(asset);
-        form.add(new JLabel("Location"));
+        form.add(new JLabel(I18n.get("col.location")));
         form.add(location);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Create support request",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.createSupportRequest.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;

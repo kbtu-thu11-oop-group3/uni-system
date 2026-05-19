@@ -13,6 +13,7 @@ import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.repository.impl.JsonCourseRepository;
 import com.kbtu.oop.project.util.ActionLogger;
 import com.kbtu.oop.project.util.GradeCalculator;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
@@ -46,7 +47,7 @@ public class GradeService {
 
     public Mark findById(UUID id) {
         return gradeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Mark not found: " + id));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.markNotFoundById", id)));
     }
 
     public Mark putMark(UUID teacherId,
@@ -72,12 +73,12 @@ public class GradeService {
 
     public Mark updateFirstAttestation(UUID teacherId, UUID studentId, UUID courseId, double firstAttestation) {
         if (firstAttestation < 0 || firstAttestation > 60) {
-            throw new ValidationException("First attestation must be between 0 and 60");
+            throw new ValidationException(I18n.get("errors.firstAttestationRange"));
         }
         Mark mark = findMarkByStudentAndCourse(studentId, courseId);
         double secondAttestation = mark.getSecondAttestation() != null ? mark.getSecondAttestation() : 0;
         if (firstAttestation + secondAttestation > 60) {
-            throw new ValidationException("Sum of first and second attestations cannot exceed 60");
+            throw new ValidationException(I18n.get("errors.attestationSumRange"));
         }
         mark.setFirstAttestation(firstAttestation);
         mark.setTeacherId(teacherId);
@@ -89,12 +90,12 @@ public class GradeService {
 
     public Mark updateSecondAttestation(UUID teacherId, UUID studentId, UUID courseId, double secondAttestation) {
         if (secondAttestation < 0 || secondAttestation > 60) {
-            throw new ValidationException("Second attestation must be between 0 and 60");
+            throw new ValidationException(I18n.get("errors.secondAttestationRange"));
         }
         Mark mark = findMarkByStudentAndCourse(studentId, courseId);
         double firstAttestation = mark.getFirstAttestation() != null ? mark.getFirstAttestation() : 0;
         if (firstAttestation + secondAttestation > 60) {
-            throw new ValidationException("Sum of first and second attestations cannot exceed 60");
+            throw new ValidationException(I18n.get("errors.attestationSumRange"));
         }
         mark.setSecondAttestation(secondAttestation);
         mark.setTeacherId(teacherId);
@@ -106,14 +107,14 @@ public class GradeService {
 
     public Mark updateFinalExam(UUID teacherId, UUID studentId, UUID courseId, double finalExam) {
         if (finalExam < 0 || finalExam > 40) {
-            throw new ValidationException("Final exam must be between 0 and 40");
+            throw new ValidationException(I18n.get("errors.finalExamRange"));
         }
         Mark mark = findMarkByStudentAndCourse(studentId, courseId);
         double firstAttestation = mark.getFirstAttestation() != null ? mark.getFirstAttestation() : 0;
         double secondAttestation = mark.getSecondAttestation() != null ? mark.getSecondAttestation() : 0;
         double total = firstAttestation + secondAttestation + finalExam;
         if (total > 100) {
-            throw new ValidationException("Total score cannot exceed 100");
+            throw new ValidationException(I18n.get("errors.totalScoreRange"));
         }
         mark.setFinalExam(finalExam);
         mark.setTeacherId(teacherId);
@@ -128,7 +129,7 @@ public class GradeService {
                 .filter(mark -> mark.getStudentId().equals(studentId) && mark.getCourseId().equals(courseId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(
-                        "Mark not found for student " + studentId + " in course " + courseId));
+                        I18n.getf("errors.markNotFoundByStudentCourse", studentId, courseId)));
     }
 
     public List<Mark> getStudentTranscript(UUID studentId) {
@@ -150,7 +151,7 @@ public class GradeService {
                 .mapToDouble(mark -> {
                     Course course = courseRepository.findById(mark.getCourseId())
                             .orElseThrow(() -> new NotFoundException(
-                                    "Course not found: " + mark.getCourseId()));
+                                    I18n.getf("errors.courseNotFoundById", mark.getCourseId())));
 
                     return GradeCalculator.getGpa(mark.getTotal()) * course.getCredits();
                 })
@@ -160,7 +161,7 @@ public class GradeService {
                 .mapToDouble(mark -> {
                     Course course = courseRepository.findById(mark.getCourseId())
                             .orElseThrow(() -> new NotFoundException(
-                                    "Course not found: " + mark.getCourseId()));
+                                    I18n.getf("errors.courseNotFoundById", mark.getCourseId())));
 
                     return course.getCredits();
                 })

@@ -6,6 +6,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -32,7 +33,7 @@ public class OrganizationsPanel extends JPanel {
         this.studentId = studentId;
         this.model = new GenericTableModel<>(List.of(
             Column.<StudentOrganization, String>builder()
-                .name("Status")
+                .name(I18n.get("col.status"))
                 .type(String.class)
                 .getter(o -> o.getStatus().name())
                 .editable(false)
@@ -41,7 +42,7 @@ public class OrganizationsPanel extends JPanel {
                 .build(),
 
                 Column.<StudentOrganization, String>builder()
-                        .name("Name")
+                        .name(I18n.get("col.name"))
                         .type(String.class)
                         .getter(StudentOrganization::getName)
                         .editable(false)
@@ -50,7 +51,7 @@ public class OrganizationsPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, String>builder()
-                        .name("Head")
+                        .name(I18n.get("col.head"))
                         .type(String.class)
                         .getter(o -> o.getHeadId() != null ? o.getHeadId().toString() : "")
                         .editable(false)
@@ -59,7 +60,7 @@ public class OrganizationsPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, Integer>builder()
-                        .name("Members")
+                        .name(I18n.get("col.members"))
                         .type(Integer.class)
                         .getter(o -> o.getMemberIds().size())
                         .editable(false)
@@ -75,10 +76,10 @@ public class OrganizationsPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JButton createButton = new JButton("Create");
-        JButton joinButton = new JButton("Join");
-        JButton leaveButton = new JButton("Leave");
-        JButton refreshButton = new JButton("Refresh");
+        JButton createButton = new JButton(I18n.get("btn.create"));
+        JButton joinButton = new JButton(I18n.get("btn.join"));
+        JButton leaveButton = new JButton(I18n.get("btn.leave"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         createButton.addActionListener(event -> createOrg());
         joinButton.addActionListener(event -> joinSelected());
@@ -102,10 +103,10 @@ public class OrganizationsPanel extends JPanel {
     private void createOrg() {
         JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
         JTextField name = new JTextField();
-        form.add(new JLabel("Name"));
+        form.add(new JLabel(I18n.get("col.name")));
         form.add(name);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Create organization",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.createOrganization.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;

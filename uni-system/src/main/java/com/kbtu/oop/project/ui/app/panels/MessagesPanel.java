@@ -6,6 +6,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,7 +36,7 @@ public class MessagesPanel extends JPanel {
     this.senderId = senderId;
     this.inboxModel = new GenericTableModel<>(List.of(
         Column.<Message, String>builder()
-            .name("From")
+            .name(I18n.get("col.from"))
             .type(String.class)
             .getter(m -> m.getSenderId().toString())
             .editable(false)
@@ -44,7 +45,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, String>builder()
-            .name("Subject")
+            .name(I18n.get("col.subject"))
             .type(String.class)
             .getter(Message::getSubject)
             .editable(false)
@@ -53,7 +54,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, String>builder()
-            .name("Body")
+            .name(I18n.get("col.body"))
             .type(String.class)
             .getter(Message::getBody)
             .editable(false)
@@ -62,7 +63,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, Boolean>builder()
-            .name("Read")
+            .name(I18n.get("col.read"))
             .type(Boolean.class)
             .getter(Message::isRead)
             .editable(false)
@@ -71,7 +72,7 @@ public class MessagesPanel extends JPanel {
             .build()));
     this.outboxModel = new GenericTableModel<>(List.of(
         Column.<Message, String>builder()
-            .name("To")
+            .name(I18n.get("col.to"))
             .type(String.class)
             .getter(m -> m.getRecipientId().toString())
             .editable(false)
@@ -80,7 +81,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, String>builder()
-            .name("Subject")
+            .name(I18n.get("col.subject"))
             .type(String.class)
             .getter(Message::getSubject)
             .editable(false)
@@ -89,7 +90,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, String>builder()
-            .name("Body")
+            .name(I18n.get("col.body"))
             .type(String.class)
             .getter(Message::getBody)
             .editable(false)
@@ -98,7 +99,7 @@ public class MessagesPanel extends JPanel {
             .build(),
 
         Column.<Message, Boolean>builder()
-            .name("Read")
+            .name(I18n.get("col.read"))
             .type(Boolean.class)
             .getter(Message::isRead)
             .editable(false)
@@ -121,15 +122,15 @@ public class MessagesPanel extends JPanel {
         JTextField subject = new JTextField();
         JTextField body = new JTextField();
 
-        sendPanel.add(new JLabel("Recipient ID"));
+        sendPanel.add(new JLabel(I18n.get("form.recipientId")));
         sendPanel.add(recipientId);
-        sendPanel.add(new JLabel("Subject"));
+        sendPanel.add(new JLabel(I18n.get("col.subject")));
         sendPanel.add(subject);
-        sendPanel.add(new JLabel("Body"));
+        sendPanel.add(new JLabel(I18n.get("col.body")));
         sendPanel.add(body);
 
-        JButton markReadButton = new JButton("Mark Read");
-        JButton sendButton = new JButton("Send");
+        JButton markReadButton = new JButton(I18n.get("btn.markRead"));
+        JButton sendButton = new JButton(I18n.get("btn.send"));
         sendButton.addActionListener(event -> {
             try {
                 messageService.sendEmployeeMessage(senderId, UUID.fromString(recipientId.getText().trim()),
@@ -163,8 +164,8 @@ public class MessagesPanel extends JPanel {
         outboxWrapper.add(new JScrollPane(outboxTable), BorderLayout.CENTER);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Inbox", inboxWrapper);
-        tabs.addTab("Outbox", outboxWrapper);
+        tabs.addTab(I18n.get("tab.inbox"), inboxWrapper);
+        tabs.addTab(I18n.get("tab.outbox"), outboxWrapper);
 
         add(tabs, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);

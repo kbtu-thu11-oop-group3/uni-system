@@ -19,7 +19,7 @@ public class AppFrame extends JFrame {
     private RolePanel rolePanel;
 
     public AppFrame() {
-        super("University System");
+        super("UniSystem");
         this.context = new UiContext();
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);

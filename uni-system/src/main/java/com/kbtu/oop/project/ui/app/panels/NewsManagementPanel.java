@@ -7,6 +7,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -34,7 +35,7 @@ public class NewsManagementPanel extends JPanel {
         this.managerId = managerId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<News, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(News::getTitle)
                         .setter(News::setTitle)
@@ -44,7 +45,7 @@ public class NewsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<News, String>builder()
-                        .name("Content")
+                        .name(I18n.get("col.content"))
                         .type(String.class)
                         .getter(News::getContent)
                         .setter(News::setContent)
@@ -54,7 +55,7 @@ public class NewsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<News, NewsTopic>builder()
-                        .name("Topic")
+                        .name(I18n.get("col.topic"))
                         .type(NewsTopic.class)
                         .getter(News::getTopic)
                         .setter(News::setTopic)
@@ -64,7 +65,7 @@ public class NewsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<News, Boolean>builder()
-                        .name("Pinned")
+                        .name(I18n.get("col.pinned"))
                         .type(Boolean.class)
                         .getter(News::isPinned)
                         .setter(News::setPinned)
@@ -82,10 +83,10 @@ public class NewsManagementPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel toolbar = new JPanel();
-        JButton addButton = new JButton("Add");
-        JButton deleteButton = new JButton("Delete");
-        JButton saveButton = new JButton("Save");
-        JButton refreshButton = new JButton("Refresh");
+        JButton addButton = new JButton(I18n.get("btn.add"));
+        JButton deleteButton = new JButton(I18n.get("btn.delete"));
+        JButton saveButton = new JButton(I18n.get("btn.save"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         addButton.addActionListener(event -> addNews());
         deleteButton.addActionListener(event -> deleteSelected());
@@ -112,14 +113,14 @@ public class NewsManagementPanel extends JPanel {
         JTextField content = new JTextField();
         JComboBox<NewsTopic> topic = new JComboBox<>(NewsTopic.values());
 
-        form.add(new JLabel("Title"));
+        form.add(new JLabel(I18n.get("col.title")));
         form.add(title);
-        form.add(new JLabel("Content"));
+        form.add(new JLabel(I18n.get("col.content")));
         form.add(content);
-        form.add(new JLabel("Topic"));
+        form.add(new JLabel(I18n.get("col.topic")));
         form.add(topic);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Create news",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.createNews.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;

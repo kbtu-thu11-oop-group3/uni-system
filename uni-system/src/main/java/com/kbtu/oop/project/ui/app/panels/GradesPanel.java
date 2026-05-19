@@ -9,6 +9,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,7 +44,7 @@ public class GradesPanel extends JPanel {
         this.teacherId = teacherId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Mark, String>builder()
-                        .name("Student")
+                        .name(I18n.get("col.student"))
                         .type(String.class)
                         .getter(m -> m.getStudentId().toString())
                         .editable(false)
@@ -52,7 +53,7 @@ public class GradesPanel extends JPanel {
                         .build(),
 
                 Column.<Mark, String>builder()
-                        .name("Course")
+                        .name(I18n.get("col.course"))
                         .type(String.class)
                         .getter(m -> m.getCourseId().toString())
                         .editable(false)
@@ -61,7 +62,7 @@ public class GradesPanel extends JPanel {
                         .build(),
 
                 Column.<Mark, Double>builder()
-                        .name("First")
+                        .name(I18n.get("col.first"))
                         .type(Double.class)
                         .getter(Mark::getFirstAttestation)
                         .editable(false)
@@ -70,7 +71,7 @@ public class GradesPanel extends JPanel {
                         .build(),
 
                 Column.<Mark, Double>builder()
-                        .name("Second")
+                        .name(I18n.get("col.second"))
                         .type(Double.class)
                         .getter(Mark::getSecondAttestation)
                         .editable(false)
@@ -79,7 +80,7 @@ public class GradesPanel extends JPanel {
                         .build(),
 
                 Column.<Mark, Double>builder()
-                        .name("Final")
+                        .name(I18n.get("col.final"))
                         .type(Double.class)
                         .getter(Mark::getFinalExam)
                         .editable(false)
@@ -88,7 +89,7 @@ public class GradesPanel extends JPanel {
                         .build(),
 
                 Column.<Mark, Double>builder()
-                        .name("Total")
+                        .name(I18n.get("col.total"))
                         .type(Double.class)
                         .getter(Mark::getTotal)
                         .editable(false)
@@ -105,7 +106,7 @@ public class GradesPanel extends JPanel {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
         JComboBox<String> courseFilter = new JComboBox<>();
-        courseFilter.addItem("All courses");
+        courseFilter.addItem(I18n.get("filter.allCourses"));
         Teacher teacher = (Teacher) userService.findById(teacherId);
         for (UUID courseId : teacher.getCourseIds()) {
             var course = courseService.findById(courseId);
@@ -124,10 +125,10 @@ public class GradesPanel extends JPanel {
             }
             refresh();
         });
-        JButton setFirst = new JButton("Set First");
-        JButton setSecond = new JButton("Set Second");
-        JButton setFinal = new JButton("Set Final");
-        JButton refresh = new JButton("Refresh");
+        JButton setFirst = new JButton(I18n.get("btn.setFirst"));
+        JButton setSecond = new JButton(I18n.get("btn.setSecond"));
+        JButton setFinal = new JButton(I18n.get("btn.setFinal"));
+        JButton refresh = new JButton(I18n.get("btn.refresh"));
 
         setFirst.addActionListener(event -> updateMark("first"));
         setSecond.addActionListener(event -> updateMark("second"));
@@ -188,10 +189,15 @@ public class GradesPanel extends JPanel {
         Mark mark = model.getRow(row);
         JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
         JTextField value = new JTextField();
-        form.add(new JLabel("Score"));
+        form.add(new JLabel(I18n.get("form.score")));
         form.add(value);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Update " + type,
+        String typeLabel = switch (type) {
+            case "first" -> I18n.get("markType.first");
+            case "second" -> I18n.get("markType.second");
+            default -> I18n.get("markType.final");
+        };
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.getf("dialog.updateMark.title", typeLabel),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;

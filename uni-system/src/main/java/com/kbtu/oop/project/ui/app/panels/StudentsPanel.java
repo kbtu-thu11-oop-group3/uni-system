@@ -5,6 +5,7 @@ import com.kbtu.oop.project.service.UserService;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -24,7 +25,7 @@ public class StudentsPanel extends JPanel {
         this.userService = userService;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Student, String>builder()
-                        .name("ID")
+                        .name(I18n.get("col.id"))
                         .type(String.class)
                         .getter(s -> s.getStudentCode() != null ? s.getStudentCode() : "")
                         .editable(false)
@@ -33,7 +34,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, String>builder()
-                        .name("Name")
+                        .name(I18n.get("col.name"))
                         .type(String.class)
                         .getter(Student::getFullName)
                         .editable(false)
@@ -42,7 +43,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, String>builder()
-                        .name("Email")
+                        .name(I18n.get("col.email"))
                         .type(String.class)
                         .getter(Student::getEmail)
                         .editable(false)
@@ -51,7 +52,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, String>builder()
-                        .name("School")
+                        .name(I18n.get("col.school"))
                         .type(String.class)
                         .getter(s -> s.getSchool() != null ? s.getSchool().name() : "")
                         .editable(false)
@@ -60,7 +61,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, Integer>builder()
-                        .name("Year")
+                        .name(I18n.get("col.year"))
                         .type(Integer.class)
                         .getter(Student::getYearOfStudy)
                         .editable(false)
@@ -69,7 +70,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, Integer>builder()
-                        .name("Credits")
+                        .name(I18n.get("col.credits"))
                         .type(Integer.class)
                         .getter(Student::getCredits)
                         .editable(false)
@@ -78,7 +79,7 @@ public class StudentsPanel extends JPanel {
                         .build(),
 
                 Column.<Student, Double>builder()
-                        .name("GPA")
+                        .name(I18n.get("col.gpa"))
                         .type(Double.class)
                         .getter(Student::getGpa)
                         .editable(false)
@@ -93,7 +94,7 @@ public class StudentsPanel extends JPanel {
         setLayout(new BorderLayout());
         JTable table = new JTable(model);
         model.configureTable(table);
-        JButton refreshButton = new JButton("Refresh");
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
         refreshButton.addActionListener(event -> refresh());
                 JPanel toolbar = new JPanel();
                 toolbar.add(refreshButton);

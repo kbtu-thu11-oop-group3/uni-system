@@ -20,10 +20,14 @@ public class RolePanel extends JPanel {
     private final JComboBox<String> languageBox = new JComboBox<>();
 
     private final User user;
+    private final UiContext context;
+    private final JPanel contentHolder = new JPanel(new BorderLayout());
+    private JLabel unsupportedRoleLabel;
 
     public RolePanel(UiContext context, User user, Runnable onLogout) {
 
         this.user = user;
+        this.context = context;
 
         setLayout(new BorderLayout());
 
@@ -48,7 +52,8 @@ public class RolePanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        add(createRolePanel(context, user), BorderLayout.CENTER);
+        contentHolder.add(createRolePanel(context, user), BorderLayout.CENTER);
+        add(contentHolder, BorderLayout.CENTER);
 
         applyTranslations();
 
@@ -108,6 +113,19 @@ public class RolePanel extends JPanel {
 
         logoutButton.setText(
                 I18n.get("role.logout"));
+
+        if (unsupportedRoleLabel != null) {
+            unsupportedRoleLabel.setText(I18n.get("role.unsupported"));
+        }
+
+        rebuildRoleContent();
+    }
+
+    private void rebuildRoleContent() {
+        contentHolder.removeAll();
+        contentHolder.add(createRolePanel(context, user), BorderLayout.CENTER);
+        contentHolder.revalidate();
+        contentHolder.repaint();
     }
 
     private JPanel createRolePanel(
@@ -139,8 +157,9 @@ public class RolePanel extends JPanel {
         }
 
         JPanel panel = new JPanel();
-
-        panel.add(new JLabel("Unsupported user role"));
+        unsupportedRoleLabel = new JLabel();
+        panel.add(unsupportedRoleLabel);
+        unsupportedRoleLabel.setText(I18n.get("role.unsupported"));
 
         return panel;
     }

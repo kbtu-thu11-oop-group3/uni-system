@@ -9,6 +9,7 @@ import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +35,7 @@ public class UserService {
 
     public User findById(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found: " + id));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", id)));
     }
 
     public User addUser(UUID adminId, User user) {
@@ -97,7 +98,7 @@ public class UserService {
     private void ensureAdmin(UUID userId) {
         User actor = findById(userId);
         if (!(actor instanceof Admin)) {
-            throw new NotFoundException("Only admin can perform this action");
+            throw new NotFoundException(I18n.get("errors.onlyAdminAction"));
         }
     }
 }

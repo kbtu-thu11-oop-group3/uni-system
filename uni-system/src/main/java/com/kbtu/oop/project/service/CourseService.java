@@ -14,6 +14,7 @@ import com.kbtu.oop.project.repository.impl.JsonCourseRepository;
 import com.kbtu.oop.project.repository.impl.JsonEnrollmentRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class CourseService {
 
     public Course findById(UUID id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Course not found: " + id));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.courseNotFoundById", id)));
     }
 
     public Course findCourseById(UUID id) {
@@ -55,21 +56,21 @@ public class CourseService {
 
     public Enrollment registerForCourse(UUID studentId, UUID courseId) {
         User user = userRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.studentNotFoundById", studentId)));
         if (!(user instanceof Student student)) {
-            throw new ValidationException("Only students can register for courses");
+            throw new ValidationException(I18n.get("errors.onlyStudentsCanRegisterCourses"));
         }
 
         Course course = findById(courseId);
 
         if (student.getFailedAttempts() >= 3) {
-            throw new ValidationException("Student cannot fail more than 3 times");
+            throw new ValidationException(I18n.get("errors.studentFailLimit"));
         }
         if (student.getCredits() + course.getCredits() > 21) {
-            throw new ValidationException("Students cannot have more than 21 credits");
+            throw new ValidationException(I18n.get("errors.studentCreditLimit"));
         }
         if (student.getEnrolledCourseIds().contains(courseId)) {
-            throw new ValidationException("Student is already registered for this course");
+            throw new ValidationException(I18n.get("errors.studentAlreadyRegisteredCourse"));
         }
 
         student.getEnrolledCourseIds().add(courseId);
@@ -103,14 +104,14 @@ public class CourseService {
     public Teacher rateTeacher(UUID studentId, UUID teacherId, int rating) {
         userRepository.findById(studentId)
                 .filter(Student.class::isInstance)
-                .orElseThrow(() -> new ValidationException("Only student can rate teacher"));
+                .orElseThrow(() -> new ValidationException(I18n.get("errors.onlyStudentCanRateTeacher")));
         if (rating < 1 || rating > 5) {
-            throw new ValidationException("Rating must be between 1 and 5");
+            throw new ValidationException(I18n.get("errors.ratingRange"));
         }
         User teacherCandidate = userRepository.findById(teacherId)
-                .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.teacherNotFoundById", teacherId)));
         if (!(teacherCandidate instanceof Teacher teacher)) {
-            throw new ValidationException("User is not a teacher: " + teacherId);
+            throw new ValidationException(I18n.getf("errors.userIsNotTeacherById", teacherId));
         }
         teacher.addRating(rating);
         userRepository.save(teacher);

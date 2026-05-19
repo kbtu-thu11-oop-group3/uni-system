@@ -8,17 +8,20 @@ import com.kbtu.oop.project.ui.app.panels.StudentCoursesPanel;
 import com.kbtu.oop.project.ui.app.panels.StudentTeachersPanel;
 import com.kbtu.oop.project.ui.app.panels.StudentTranscriptPanel;
 import com.kbtu.oop.project.ui.app.panels.ResearchPanel;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 
 public class StudentPanel extends JPanel {
+    private final JTabbedPane tabs = new JTabbedPane();
+    private final boolean showResearchTab;
 
     public StudentPanel(UiContext context, Student student, boolean isGraduate) {
         setLayout(new BorderLayout());
+        showResearchTab = isGraduate || context.researchService.isResearcher(student.getId());
 
-        JTabbedPane tabs = new JTabbedPane();
         StudentTeachersPanel teachersPanel = new StudentTeachersPanel(context.courseService, context.userService,
             student.getId());
         StudentCoursesPanel coursesPanel = new StudentCoursesPanel(
@@ -30,18 +33,31 @@ public class StudentPanel extends JPanel {
                 tabs.setSelectedComponent(teachersPanel);
             });
 
-        tabs.addTab("Courses", coursesPanel);
-        tabs.addTab("Teachers", teachersPanel);
-        tabs.addTab("Transcript",
+        tabs.addTab("", coursesPanel);
+        tabs.addTab("", teachersPanel);
+        tabs.addTab("",
             new StudentTranscriptPanel(context.gradeService, context.courseService, student.getId()));
-        tabs.addTab("Organizations", new OrganizationsPanel(context.studentOrganizationService, student.getId()));
-        tabs.addTab("News", new NewsPanel(context.newsService));
+        tabs.addTab("", new OrganizationsPanel(context.studentOrganizationService, student.getId()));
+        tabs.addTab("", new NewsPanel(context.newsService, context.researchService, student.getId()));
 
         // Research tab for graduates and eligible researchers
-        if (isGraduate || context.researchService.isResearcher(student.getId())) {
-            tabs.addTab("Research", new ResearchPanel(context.researchService, student.getId()));
+        if (showResearchTab) {
+            tabs.addTab("", new ResearchPanel(context.researchService, student.getId()));
         }
+        applyTranslations();
+        I18n.addListener(this::applyTranslations);
 
         add(tabs, BorderLayout.CENTER);
+    }
+
+    private void applyTranslations() {
+        tabs.setTitleAt(0, I18n.get("tab.courses"));
+        tabs.setTitleAt(1, I18n.get("tab.teachers"));
+        tabs.setTitleAt(2, I18n.get("tab.transcript"));
+        tabs.setTitleAt(3, I18n.get("tab.organizations"));
+        tabs.setTitleAt(4, I18n.get("tab.news"));
+        if (showResearchTab) {
+            tabs.setTitleAt(5, I18n.get("tab.research"));
+        }
     }
 }

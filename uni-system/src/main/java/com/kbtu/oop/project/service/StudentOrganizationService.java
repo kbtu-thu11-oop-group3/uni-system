@@ -12,6 +12,7 @@ import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonStudentOrganizationRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,9 +59,9 @@ public class StudentOrganizationService {
     public StudentOrganization join(UUID studentId, UUID orgId) {
         ensureStudent(studentId);
         StudentOrganization org = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found: " + orgId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.organizationNotFoundById", orgId)));
         if (org.getStatus() != RequestStatus.ACCEPTED) {
-            throw new ValidationException("Organization is not approved yet");
+            throw new ValidationException(I18n.get("errors.organizationNotApprovedYet"));
         }
         if (!org.getMemberIds().contains(studentId)) {
             org.getMemberIds().add(studentId);
@@ -73,7 +74,7 @@ public class StudentOrganizationService {
     public StudentOrganization leave(UUID studentId, UUID orgId) {
         ensureStudent(studentId);
         StudentOrganization org = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found: " + orgId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.organizationNotFoundById", orgId)));
         org.getMemberIds().remove(studentId);
         if (studentId.equals(org.getHeadId())) {
             org.setHeadId(org.getMemberIds().isEmpty() ? null : org.getMemberIds().get(0));
@@ -86,12 +87,12 @@ public class StudentOrganizationService {
     public StudentOrganization setHead(UUID studentId, UUID orgId) {
         ensureStudent(studentId);
         StudentOrganization org = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found: " + orgId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.organizationNotFoundById", orgId)));
         if (org.getStatus() != RequestStatus.ACCEPTED) {
-            throw new ValidationException("Organization is not approved yet");
+            throw new ValidationException(I18n.get("errors.organizationNotApprovedYet"));
         }
         if (!org.getMemberIds().contains(studentId)) {
-            throw new ValidationException("Only members can become head");
+            throw new ValidationException(I18n.get("errors.onlyMembersCanBecomeHead"));
         }
         org.setHeadId(studentId);
         StudentOrganization saved = organizationRepository.save(org);
@@ -102,7 +103,7 @@ public class StudentOrganizationService {
     public StudentOrganization approve(UUID managerId, UUID orgId) {
         ensureManager(managerId);
         StudentOrganization org = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found: " + orgId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.organizationNotFoundById", orgId)));
         org.setStatus(RequestStatus.ACCEPTED);
         org.setHeadId(org.getRequesterId());
         if (org.getRequesterId() != null && !org.getMemberIds().contains(org.getRequesterId())) {
@@ -116,7 +117,7 @@ public class StudentOrganizationService {
     public StudentOrganization reject(UUID managerId, UUID orgId) {
         ensureManager(managerId);
         StudentOrganization org = organizationRepository.findById(orgId)
-                .orElseThrow(() -> new NotFoundException("Organization not found: " + orgId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.organizationNotFoundById", orgId)));
         org.setStatus(RequestStatus.REJECTED);
         StudentOrganization saved = organizationRepository.save(org);
         actionLogger.log(managerId, "REJECT_ORG", "Rejected organization " + orgId);
@@ -131,17 +132,17 @@ public class StudentOrganizationService {
 
     private void ensureStudent(UUID studentId) {
         User user = userRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.studentNotFoundById", studentId)));
         if (!(user instanceof Student)) {
-            throw new ValidationException("Only student can perform this action");
+            throw new ValidationException(I18n.get("errors.onlyStudentAction"));
         }
     }
 
     private void ensureManager(UUID managerId) {
         User user = userRepository.findById(managerId)
-                .orElseThrow(() -> new NotFoundException("Manager not found: " + managerId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.managerNotFoundById", managerId)));
         if (!(user instanceof Manager)) {
-            throw new ValidationException("Only manager can perform this action");
+            throw new ValidationException(I18n.get("errors.onlyManagerAction"));
         }
     }
 }

@@ -17,6 +17,7 @@ import com.kbtu.oop.project.repository.impl.JsonEnrollmentRepository;
 import com.kbtu.oop.project.repository.impl.JsonGradeRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.UUID;
 
@@ -68,13 +69,13 @@ public class ManagerService {
     public void assignCourseToTeacher(UUID managerId, UUID courseId, UUID teacherId) {
         ensureManager(managerId);
         User teacherCandidate = userRepository.findById(teacherId)
-                .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.teacherNotFoundById", teacherId)));
         if (!(teacherCandidate instanceof Teacher teacher)) {
-            throw new ValidationException("User is not a teacher: " + teacherId);
+            throw new ValidationException(I18n.getf("errors.userIsNotTeacherById", teacherId));
         }
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.courseNotFoundById", courseId)));
 
         if (!course.getInstructorIds().contains(teacherId)) {
             course.getInstructorIds().add(teacherId);
@@ -90,7 +91,7 @@ public class ManagerService {
     public Enrollment approveRegistration(UUID managerId, UUID enrollmentId) {
         ensureManager(managerId);
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new NotFoundException("Enrollment not found: " + enrollmentId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.enrollmentNotFoundById", enrollmentId)));
         enrollment.setStatus(com.kbtu.oop.project.model.common.RequestStatus.ACCEPTED);
         Enrollment saved = enrollmentRepository.save(enrollment);
         
@@ -107,7 +108,7 @@ public class ManagerService {
     public Enrollment rejectRegistration(UUID managerId, UUID enrollmentId) {
         ensureManager(managerId);
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new NotFoundException("Enrollment not found: " + enrollmentId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.enrollmentNotFoundById", enrollmentId)));
         enrollment.setStatus(com.kbtu.oop.project.model.common.RequestStatus.REJECTED);
         Enrollment saved = enrollmentRepository.save(enrollment);
         actionLogger.log(managerId, "REJECT_REGISTRATION", "Rejected enrollment " + enrollmentId);
@@ -116,9 +117,9 @@ public class ManagerService {
 
     private void ensureManager(UUID managerId) {
         User user = userRepository.findById(managerId)
-                .orElseThrow(() -> new NotFoundException("Manager not found: " + managerId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.managerNotFoundById", managerId)));
         if (!(user instanceof Manager)) {
-            throw new ValidationException("Only manager can perform this action");
+            throw new ValidationException(I18n.get("errors.onlyManagerAction"));
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.kbtu.oop.project.ui.app.table;
 
+import com.kbtu.oop.project.util.I18n;
+
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -19,6 +21,7 @@ public final class TableUtils {
         table.setRowSorter(sorter);
 
         JTextField searchField = new JTextField(18);
+        searchField.setToolTipText(I18n.get("ui.search.tooltip"));
         toolbar.add(searchField);
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {

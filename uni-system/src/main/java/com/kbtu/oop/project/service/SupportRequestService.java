@@ -12,6 +12,7 @@ import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonSupportRequestRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,9 +38,9 @@ public class SupportRequestService {
     public SupportRequest createRequest(UUID requesterId, String title, String description, String assetName,
             String location) {
         User requester = userRepository.findById(requesterId)
-            .orElseThrow(() -> new NotFoundException("Requester not found: " + requesterId));
+            .orElseThrow(() -> new NotFoundException(I18n.getf("errors.requesterNotFoundById", requesterId)));
         if (!(requester instanceof Employee) || requester instanceof TechSupportSpecialist) {
-            throw new ValidationException("Only employees (excluding support) can create requests");
+            throw new ValidationException(I18n.get("errors.onlyEmployeesCanCreateSupportRequests"));
         }
         SupportRequest request = new SupportRequest();
         request.setRequesterId(requesterId);
@@ -54,7 +55,7 @@ public class SupportRequestService {
 
     public List<SupportRequest> listByRequester(UUID requesterId) {
         userRepository.findById(requesterId)
-                .orElseThrow(() -> new NotFoundException("Requester not found: " + requesterId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.requesterNotFoundById", requesterId)));
         return supportRequestRepository.findAll().stream()
                 .filter(request -> requesterId.equals(request.getRequesterId()))
                 .toList();
@@ -81,10 +82,10 @@ public class SupportRequestService {
     public SupportRequest updateStatus(UUID specialistId, UUID requestId, RequestStatus status) {
         ensureSpecialist(specialistId);
         if (status == RequestStatus.NEW) {
-            throw new ValidationException("Specialist cannot reset request to NEW status");
+            throw new ValidationException(I18n.get("errors.specialistCannotResetToNew"));
         }
         SupportRequest request = supportRequestRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException("Support request not found: " + requestId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.supportRequestNotFoundById", requestId)));
         request.setStatus(status);
         SupportRequest saved = supportRequestRepository.save(request);
         actionLogger.log(specialistId, "UPDATE_SUPPORT_STATUS", "Updated request " + requestId + " to " + status);
@@ -93,9 +94,9 @@ public class SupportRequestService {
 
     private void ensureSpecialist(UUID specialistId) {
         User user = userRepository.findById(specialistId)
-                .orElseThrow(() -> new NotFoundException("Specialist not found: " + specialistId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.specialistNotFoundById", specialistId)));
         if (!(user instanceof TechSupportSpecialist)) {
-            throw new ValidationException("Only tech support specialist can perform this action");
+            throw new ValidationException(I18n.get("errors.onlySpecialistAction"));
         }
     }
 }

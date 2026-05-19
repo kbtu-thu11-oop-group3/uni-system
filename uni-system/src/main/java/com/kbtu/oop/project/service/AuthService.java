@@ -29,10 +29,10 @@ public class AuthService {
         User user = userOptional.orElseThrow(() -> new AuthException(I18n.get("errors.invalidCredentials")));
 
         if (!user.isActive()) {
-            throw new AuthException("User account is not active");
+            throw new AuthException(I18n.get("errors.userIsNotActive"));
         }
         if (user.getPasswordHash() == null || !user.getPasswordHash().equals(password)) {
-            throw new AuthException("Invalid credentials");
+            throw new AuthException(I18n.get("errors.invalidCredentials"));
         }
 
         actionLogger.log(user.getId(), "LOGIN", "User logged in");

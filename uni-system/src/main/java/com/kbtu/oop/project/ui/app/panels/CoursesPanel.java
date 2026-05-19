@@ -8,6 +8,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -46,7 +47,7 @@ public class CoursesPanel extends JPanel {
         this.showMyCoursesToggle = showMyCoursesToggle;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Course, String>builder()
-                        .name("Code")
+                        .name(I18n.get("col.code"))
                         .type(String.class)
                         .getter(Course::getCode)
                         .setter(Course::setCode)
@@ -56,7 +57,7 @@ public class CoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(Course::getTitle)
                         .setter(Course::setTitle)
@@ -66,7 +67,7 @@ public class CoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, String>builder()
-                        .name("Description")
+                        .name(I18n.get("col.description"))
                         .type(String.class)
                         .getter(Course::getDescription)
                         .setter(Course::setDescription)
@@ -76,7 +77,7 @@ public class CoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, Integer>builder()
-                        .name("Credits")
+                        .name(I18n.get("col.credits"))
                         .type(Integer.class)
                         .getter(Course::getCredits)
                         .setter((c, v) -> c.setCredits(v))
@@ -86,7 +87,7 @@ public class CoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, CourseType>builder()
-                        .name("Type")
+                        .name(I18n.get("col.type"))
                         .type(CourseType.class)
                         .getter(Course::getCourseType)
                         .setter(Course::setCourseType)
@@ -106,11 +107,11 @@ public class CoursesPanel extends JPanel {
 
         if (editable) {
             JPanel toolbar = new JPanel();
-            JCheckBox myCourses = new JCheckBox("My Courses");
-            JButton addButton = new JButton("Add");
-            JButton deleteButton = new JButton("Delete");
-            JButton saveButton = new JButton("Save");
-            JButton refreshButton = new JButton("Refresh");
+            JCheckBox myCourses = new JCheckBox(I18n.get("btn.myCourses"));
+            JButton addButton = new JButton(I18n.get("btn.add"));
+            JButton deleteButton = new JButton(I18n.get("btn.delete"));
+            JButton saveButton = new JButton(I18n.get("btn.save"));
+            JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
             myCourses.addActionListener(event -> {
                 onlyMyCourses = myCourses.isSelected();
@@ -133,14 +134,14 @@ public class CoursesPanel extends JPanel {
         } else {
             JPanel toolbar = new JPanel();
             if (showMyCoursesToggle) {
-                JCheckBox myCourses = new JCheckBox("My Courses");
+                JCheckBox myCourses = new JCheckBox(I18n.get("btn.myCourses"));
                 myCourses.addActionListener(event -> {
                     onlyMyCourses = myCourses.isSelected();
                     refresh();
                 });
                 toolbar.add(myCourses);
             }
-            JButton refreshButton = new JButton("Refresh");
+            JButton refreshButton = new JButton(I18n.get("btn.refresh"));
             refreshButton.addActionListener(event -> refresh());
             toolbar.add(refreshButton);
             TableUtils.addSearchField(toolbar, table);
@@ -161,7 +162,7 @@ public class CoursesPanel extends JPanel {
     private void addCourse() {
         Course course = new Course();
         course.setCode("NEW");
-        course.setTitle("New course");
+        course.setTitle(I18n.get("default.newCourseTitle"));
         course.setDescription("");
         course.setCredits(3);
         course.setCourseType(CourseType.MAJOR);

@@ -26,6 +26,7 @@ import com.kbtu.oop.project.repository.impl.JsonResearchJournalRepository;
 import com.kbtu.oop.project.repository.impl.JsonResearcherProfileRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -93,9 +94,9 @@ public class NewsService {
 
     public NewsComment addComment(UUID userId, UUID newsId, String text) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", userId)));
         News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new NotFoundException("News not found: " + newsId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.newsNotFoundById", newsId)));
 
         NewsComment comment = new NewsComment();
         comment.setNewsId(newsId);
@@ -163,9 +164,9 @@ public class NewsService {
 
     public News publishResearchNews(UUID authorId, String title, String content, NewsTopic topic) {
         User author = userRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + authorId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", authorId)));
         if (!(author instanceof Manager) && resolveResearchPaperIds(author).isEmpty()) {
-            throw new ValidationException("Only managers or researchers can publish research news");
+            throw new ValidationException(I18n.get("errors.onlyManagerOrResearcherPublishResearchNews"));
         }
         News news = new News();
         news.setTitle(title);
@@ -179,9 +180,9 @@ public class NewsService {
 
     private void ensureManager(UUID managerId) {
         User user = userRepository.findById(managerId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + managerId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", managerId)));
         if (!(user instanceof Manager)) {
-            throw new NotFoundException("Only manager can perform this action");
+            throw new NotFoundException(I18n.get("errors.onlyManagerAction"));
         }
     }
 

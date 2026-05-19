@@ -2,6 +2,7 @@ package com.kbtu.oop.project.util;
 
 import javax.swing.SwingUtilities;
 import java.awt.Window;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -22,7 +23,8 @@ public class I18n {
         locale = newLocale;
         bundle = ResourceBundle.getBundle("i18n.messages", locale);
 
-        for (Runnable listener : listeners) {
+        List<Runnable> snapshot = new ArrayList<>(listeners);
+        for (Runnable listener : snapshot) {
             listener.run();
         }
 
@@ -41,6 +43,10 @@ public class I18n {
         } catch (Exception e) {
             return "!" + key + "!";
         }
+    }
+
+    public static String getf(String key, Object... args) {
+        return MessageFormat.format(get(key), args);
     }
 
     public static void addListener(Runnable listener) {

@@ -13,6 +13,7 @@ import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonComplaintRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,9 +39,9 @@ public class ComplaintService {
     public Complaint sendComplaint(UUID teacherId, List<UUID> studentIds, UrgencyLevel urgencyLevel, String title,
             String description) {
         User teacherCandidate = userRepository.findById(teacherId)
-                .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.teacherNotFoundById", teacherId)));
         if (!(teacherCandidate instanceof Teacher)) {
-            throw new ValidationException("Only teacher can send complaints");
+            throw new ValidationException(I18n.get("errors.onlyTeacherCanSendComplaints"));
         }
 
         Complaint complaint = new Complaint();
@@ -62,7 +63,7 @@ public class ComplaintService {
     public Complaint updateStatus(UUID managerId, UUID complaintId, RequestStatus status) {
         ensureManager(managerId);
         Complaint complaint = complaintRepository.findById(complaintId)
-                .orElseThrow(() -> new NotFoundException("Complaint not found: " + complaintId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.complaintNotFoundById", complaintId)));
         complaint.setStatus(status);
         Complaint saved = complaintRepository.save(complaint);
         actionLogger.log(managerId, "UPDATE_COMPLAINT", "Updated complaint " + complaintId + " to " + status);
@@ -71,9 +72,9 @@ public class ComplaintService {
 
     public List<Complaint> listByTeacher(UUID teacherId) {
         User teacherCandidate = userRepository.findById(teacherId)
-                .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.teacherNotFoundById", teacherId)));
         if (!(teacherCandidate instanceof Teacher)) {
-            throw new ValidationException("Only teacher can view complaints");
+            throw new ValidationException(I18n.get("errors.onlyTeacherCanViewComplaints"));
         }
 
         return complaintRepository.findAll().stream()
@@ -83,9 +84,9 @@ public class ComplaintService {
 
     private void ensureManager(UUID managerId) {
         User user = userRepository.findById(managerId)
-                .orElseThrow(() -> new NotFoundException("Manager not found: " + managerId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.managerNotFoundById", managerId)));
         if (!(user instanceof Manager)) {
-            throw new ValidationException("Only manager can perform this action");
+            throw new ValidationException(I18n.get("errors.onlyManagerAction"));
         }
     }
 }

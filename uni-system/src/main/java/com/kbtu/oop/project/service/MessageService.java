@@ -10,6 +10,7 @@ import com.kbtu.oop.project.repository.UserRepository;
 import com.kbtu.oop.project.repository.impl.JsonMessageRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,11 +35,11 @@ public class MessageService {
 
     public Message sendEmployeeMessage(UUID senderId, UUID recipientId, String subject, String body) {
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new NotFoundException("Sender not found: " + senderId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.senderNotFoundById", senderId)));
         User recipient = userRepository.findById(recipientId)
-                .orElseThrow(() -> new NotFoundException("Recipient not found: " + recipientId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.recipientNotFoundById", recipientId)));
         if (!(sender instanceof Employee) || !(recipient instanceof Employee)) {
-            throw new ValidationException("Only employees can exchange official messages");
+            throw new ValidationException(I18n.get("errors.onlyEmployeesCanExchangeMessages"));
         }
 
         Message message = new Message();
@@ -65,9 +66,9 @@ public class MessageService {
 
     public Message markRead(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NotFoundException("Message not found: " + messageId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.messageNotFoundById", messageId)));
         if (!userId.equals(message.getRecipientId())) {
-            throw new ValidationException("Only recipient can mark message as read");
+            throw new ValidationException(I18n.get("errors.onlyRecipientCanMarkRead"));
         }
         message.setRead(true);
         return messageRepository.save(message);

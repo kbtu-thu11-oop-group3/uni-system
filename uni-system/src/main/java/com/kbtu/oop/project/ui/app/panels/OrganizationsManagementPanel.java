@@ -7,6 +7,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,7 +31,7 @@ public class OrganizationsManagementPanel extends JPanel {
         this.managerId = managerId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<StudentOrganization, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(o -> o.getStatus().name())
                         .editable(false)
@@ -39,7 +40,7 @@ public class OrganizationsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, String>builder()
-                        .name("Name")
+                        .name(I18n.get("col.name"))
                         .type(String.class)
                         .getter(StudentOrganization::getName)
                         .editable(false)
@@ -48,7 +49,7 @@ public class OrganizationsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, String>builder()
-                        .name("Requester")
+                        .name(I18n.get("col.requester"))
                         .type(String.class)
                         .getter(o -> o.getRequesterId() != null ? o.getRequesterId().toString() : "")
                         .editable(false)
@@ -57,7 +58,7 @@ public class OrganizationsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, String>builder()
-                        .name("Head")
+                        .name(I18n.get("col.head"))
                         .type(String.class)
                         .getter(o -> o.getHeadId() != null ? o.getHeadId().toString() : "")
                         .editable(false)
@@ -66,7 +67,7 @@ public class OrganizationsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<StudentOrganization, Integer>builder()
-                        .name("Members")
+                        .name(I18n.get("col.members"))
                         .type(Integer.class)
                         .getter(o -> o.getMemberIds().size())
                         .editable(false)
@@ -83,9 +84,9 @@ public class OrganizationsManagementPanel extends JPanel {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
         JComboBox<RequestStatus> statusCombo = new JComboBox<>(new RequestStatus[] { RequestStatus.ACCEPTED, RequestStatus.REJECTED });
-        JButton updateButton = new JButton("Update Status");
-        JButton deleteButton = new JButton("Delete");
-        JButton refreshButton = new JButton("Refresh");
+        JButton updateButton = new JButton(I18n.get("btn.updateStatus"));
+        JButton deleteButton = new JButton(I18n.get("btn.delete"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         updateButton.addActionListener(event -> updateSelected((RequestStatus) statusCombo.getSelectedItem()));
         deleteButton.addActionListener(event -> deleteSelected());

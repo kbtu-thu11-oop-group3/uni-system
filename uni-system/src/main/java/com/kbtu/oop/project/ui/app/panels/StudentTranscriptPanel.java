@@ -8,6 +8,7 @@ import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
 import com.kbtu.oop.project.util.GradeCalculator;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -34,7 +35,7 @@ public class StudentTranscriptPanel extends JPanel {
         this.model = new GenericTableModel<>(List.of(
 
                 Column.<Row, String>builder()
-                        .name("Code")
+                        .name(I18n.get("col.code"))
                         .type(String.class)
                         .getter(row -> row.code)
                         .editable(false)
@@ -43,7 +44,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(row -> row.title)
                         .editable(false)
@@ -52,7 +53,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, Integer>builder()
-                        .name("Credits")
+                        .name(I18n.get("col.credits"))
                         .type(Integer.class)
                         .getter(row -> row.credits)
                         .editable(false)
@@ -61,7 +62,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, String>builder()
-                        .name("First")
+                        .name(I18n.get("col.first"))
                         .type(String.class)
                         .getter(row -> row.first)
                         .editable(false)
@@ -70,7 +71,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, String>builder()
-                        .name("Second")
+                        .name(I18n.get("col.second"))
                         .type(String.class)
                         .getter(row -> row.second)
                         .editable(false)
@@ -79,7 +80,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, String>builder()
-                        .name("Final")
+                        .name(I18n.get("col.final"))
                         .type(String.class)
                         .getter(row -> row.finalExam)
                         .editable(false)
@@ -88,7 +89,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, Double>builder()
-                        .name("Total")
+                        .name(I18n.get("col.total"))
                         .type(Double.class)
                         .getter(row -> row.total)
                         .editable(false)
@@ -97,7 +98,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, String>builder()
-                        .name("Letter")
+                        .name(I18n.get("col.letter"))
                         .type(String.class)
                         .getter(row -> row.letter)
                         .editable(false)
@@ -106,7 +107,7 @@ public class StudentTranscriptPanel extends JPanel {
                         .build(),
 
                 Column.<Row, Double>builder()
-                        .name("GPA")
+                        .name(I18n.get("col.gpa"))
                         .type(Double.class)
                         .getter(row -> row.gpa)
                         .editable(false)
@@ -121,7 +122,7 @@ public class StudentTranscriptPanel extends JPanel {
         setLayout(new BorderLayout());
         JTable table = new JTable(model);
         model.configureTable(table);
-        JButton refreshButton = new JButton("Refresh");
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
         refreshButton.addActionListener(event -> refresh());
                 JPanel toolbar = new JPanel();
                 toolbar.add(refreshButton);
@@ -140,7 +141,7 @@ public class StudentTranscriptPanel extends JPanel {
                     : "-";
             String finalExam = mark.getFinalExam() != null ? String.format("%.0f", mark.getFinalExam()) : "-";
             double total = mark.getTotal();
-            String letter = mark.isComplete() ? GradeCalculator.getLetterGrade(total) : "N/A";
+            String letter = mark.isComplete() ? GradeCalculator.getLetterGrade(total) : I18n.get("common.na");
             double gpa = mark.isComplete() ? GradeCalculator.getGpa(total) : 0.0;
             rows.add(new Row(course.getCode(), course.getTitle(), course.getCredits(), first, second, finalExam, total,
                     letter, gpa));

@@ -6,6 +6,7 @@ import com.kbtu.oop.project.service.ResearchService;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,47 +34,47 @@ public class ResearchPanel extends JPanel {
         this.papersModel = new GenericTableModel<>(List.of(
 
                 Column.<ResearchPaper, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(ResearchPaper::getTitle)
                         .width(260)
                         .build(),
 
                 Column.<ResearchPaper, String>builder()
-                        .name("Authors")
+                        .name(I18n.get("col.authors"))
                         .type(String.class)
                         .getter(p -> String.join(", ", p.getAuthors()))
                         .width(200)
                         .build(),
 
                 Column.<ResearchPaper, String>builder()
-                        .name("Journal")
+                        .name(I18n.get("col.journal"))
                         .type(String.class)
                         .getter(p -> {
                             ResearchJournal j = findJournal(p.getJournalId());
-                            return j != null ? j.getName() : "Unknown";
+                            return j != null ? j.getName() : I18n.get("common.unknown");
                         })
                         .width(180)
                         .build(),
 
                 Column.<ResearchPaper, String>builder()
-                        .name("Date")
+                        .name(I18n.get("col.date"))
                         .type(String.class)
                         .getter(p -> p.getPublicationDate() == null
-                                ? "-"
+                                ? I18n.get("common.naShort")
                                 : p.getPublicationDate().toString())
                         .width(120)
                         .build(),
 
                 Column.<ResearchPaper, Integer>builder()
-                        .name("Citations")
+                        .name(I18n.get("col.citations"))
                         .type(Integer.class)
                         .getter(ResearchPaper::getCitations)
                         .width(90)
                         .build(),
 
                 Column.<ResearchPaper, String>builder()
-                        .name("DOI")
+                        .name(I18n.get("col.doi"))
                         .type(String.class)
                         .getter(ResearchPaper::getDoi)
                         .width(160)
@@ -95,7 +96,7 @@ public class ResearchPanel extends JPanel {
     private JPanel buildTopBar() {
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton refresh = new JButton("Refresh");
+        JButton refresh = new JButton(I18n.get("btn.refresh"));
         refresh.addActionListener(e -> load());
 
         TableUtils.addSearchField(top, papersTable);
@@ -108,7 +109,7 @@ public class ResearchPanel extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setPreferredSize(new Dimension(320, 0));
-        panel.setBorder(BorderFactory.createTitledBorder("Publish Paper"));
+        panel.setBorder(BorderFactory.createTitledBorder(I18n.get("panel.publishPaper")));
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
@@ -119,12 +120,12 @@ public class ResearchPanel extends JPanel {
         JTextField doi = new JTextField();
         JTextField authors = new JTextField();
 
-        JButton publish = new JButton("Publish");
+        JButton publish = new JButton(I18n.get("btn.publish"));
 
         publish.addActionListener(e -> {
             ResearchJournal j = (ResearchJournal) journalSelector.getSelectedItem();
             if (j == null) {
-                JOptionPane.showMessageDialog(this, "Select journal");
+                JOptionPane.showMessageDialog(this, I18n.get("msg.selectJournal"));
                 return;
             }
 
@@ -142,22 +143,22 @@ public class ResearchPanel extends JPanel {
         int y = 0;
 
         c.gridy = y++;
-        panel.add(new JLabel("Title"), c);
+        panel.add(new JLabel(I18n.get("col.title")), c);
         c.gridy = y++;
         panel.add(title, c);
 
         c.gridy = y++;
-        panel.add(new JLabel("Authors"), c);
+        panel.add(new JLabel(I18n.get("col.authors")), c);
         c.gridy = y++;
         panel.add(authors, c);
 
         c.gridy = y++;
-        panel.add(new JLabel("Journal"), c);
+        panel.add(new JLabel(I18n.get("col.journal")), c);
         c.gridy = y++;
         panel.add(journalSelector, c);
 
         c.gridy = y++;
-        panel.add(new JLabel("DOI"), c);
+        panel.add(new JLabel(I18n.get("col.doi")), c);
         c.gridy = y++;
         panel.add(doi, c);
 

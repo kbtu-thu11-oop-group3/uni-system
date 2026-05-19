@@ -6,6 +6,7 @@ import com.kbtu.oop.project.service.GradeService;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -31,7 +32,7 @@ public class ReportsPanel extends JPanel {
         this.courseService = courseService;
         this.model = new GenericTableModel<>(List.of(
                 Column.<ReportRow, String>builder()
-                        .name("Code")
+                        .name(I18n.get("col.code"))
                         .type(String.class)
                         .getter(r -> r.code)
                         .editable(false)
@@ -40,7 +41,7 @@ public class ReportsPanel extends JPanel {
                         .build(),
 
                 Column.<ReportRow, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(r -> r.title)
                         .editable(false)
@@ -49,7 +50,7 @@ public class ReportsPanel extends JPanel {
                         .build(),
 
                 Column.<ReportRow, Long>builder()
-                        .name("Count")
+                        .name(I18n.get("col.count"))
                         .type(Long.class)
                         .getter(r -> r.stats.getCount())
                         .editable(false)
@@ -58,7 +59,7 @@ public class ReportsPanel extends JPanel {
                         .build(),
 
                 Column.<ReportRow, Double>builder()
-                        .name("Min")
+                        .name(I18n.get("col.min"))
                         .type(Double.class)
                         .getter(r -> r.stats.getMin())
                         .editable(false)
@@ -67,7 +68,7 @@ public class ReportsPanel extends JPanel {
                         .build(),
 
                 Column.<ReportRow, Double>builder()
-                        .name("Max")
+                        .name(I18n.get("col.max"))
                         .type(Double.class)
                         .getter(r -> r.stats.getMax())
                         .editable(false)
@@ -76,7 +77,7 @@ public class ReportsPanel extends JPanel {
                         .build(),
 
                 Column.<ReportRow, Double>builder()
-                        .name("Avg")
+                        .name(I18n.get("col.avg"))
                         .type(Double.class)
                         .getter(r -> r.stats.getAverage())
                         .editable(false)
@@ -91,7 +92,7 @@ public class ReportsPanel extends JPanel {
         setLayout(new BorderLayout());
         JTable table = new JTable(model);
         model.configureTable(table);
-        JButton refreshButton = new JButton("Refresh");
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
         refreshButton.addActionListener(event -> refresh());
         JPanel toolbar = new JPanel();
         toolbar.add(refreshButton);

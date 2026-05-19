@@ -8,6 +8,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -39,7 +40,7 @@ public class StudentCoursesPanel extends JPanel {
         this.onViewTeachers = onViewTeachers;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Course, String>builder()
-                        .name("Code")
+                        .name(I18n.get("col.code"))
                         .type(String.class)
                         .getter(Course::getCode)
                         .editable(false)
@@ -48,7 +49,7 @@ public class StudentCoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(Course::getTitle)
                         .editable(false)
@@ -57,7 +58,7 @@ public class StudentCoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, Integer>builder()
-                        .name("Credits")
+                        .name(I18n.get("col.credits"))
                         .type(Integer.class)
                         .getter(Course::getCredits)
                         .editable(false)
@@ -66,7 +67,7 @@ public class StudentCoursesPanel extends JPanel {
                         .build(),
 
                 Column.<Course, String>builder()
-                        .name("Type")
+                        .name(I18n.get("col.type"))
                         .type(String.class)
                         .getter(c -> c.getCourseType().name())
                         .editable(false)
@@ -83,10 +84,10 @@ public class StudentCoursesPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JCheckBox myCourses = new JCheckBox("My Courses");
-        JButton registerButton = new JButton("Register");
-        JButton viewTeachersButton = new JButton("View Teachers");
-        JButton refreshButton = new JButton("Refresh");
+        JCheckBox myCourses = new JCheckBox(I18n.get("btn.myCourses"));
+        JButton registerButton = new JButton(I18n.get("btn.register"));
+        JButton viewTeachersButton = new JButton(I18n.get("btn.viewTeachers"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         myCourses.addActionListener(event -> {
             onlyMyCourses = myCourses.isSelected();
@@ -127,7 +128,7 @@ public class StudentCoursesPanel extends JPanel {
         Course course = model.getRow(row);
         try {
             Enrollment enrollment = courseService.registerForCourse(studentId, course.getId());
-            UiDialogs.showInfo(this, "Enrollment created: " + enrollment.getId());
+            UiDialogs.showInfo(this, I18n.getf("msg.enrollmentCreatedById", enrollment.getId()));
         } catch (Exception e) {
             UiDialogs.showError(this, e.getMessage());
         }

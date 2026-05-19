@@ -3,6 +3,7 @@ package com.kbtu.oop.project.ui.app.panels;
 import com.kbtu.oop.project.model.common.ActionLogEntry;
 import com.kbtu.oop.project.util.DataPaths;
 import com.kbtu.oop.project.util.JsonUtil;
+import com.kbtu.oop.project.util.I18n;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
@@ -25,7 +26,7 @@ public class LogsPanel extends JPanel {
     public LogsPanel() {
         this.model = new GenericTableModel<>(List.of(
                 Column.<ActionLogEntry, String>builder()
-                        .name("Time")
+                        .name(I18n.get("col.time"))
                         .type(String.class)
                         .getter(e -> e.getOccurredAt().format(DateTimeFormatter.ofPattern(
                                 "dd.MM.yyyy HH:mm")))
@@ -35,7 +36,7 @@ public class LogsPanel extends JPanel {
                         .build(),
 
                 Column.<ActionLogEntry, String>builder()
-                        .name("Action")
+                        .name(I18n.get("col.action"))
                         .type(String.class)
                         .getter(ActionLogEntry::getAction)
                         .editable(false)
@@ -44,7 +45,7 @@ public class LogsPanel extends JPanel {
                         .build(),
 
                 Column.<ActionLogEntry, String>builder()
-                        .name("Details")
+                        .name(I18n.get("col.details"))
                         .type(String.class)
                         .getter(ActionLogEntry::getDetails)
                         .editable(false)
@@ -53,7 +54,7 @@ public class LogsPanel extends JPanel {
                         .build(),
 
                 Column.<ActionLogEntry, String>builder()
-                        .name("Actor")
+                        .name(I18n.get("col.actor"))
                         .type(String.class)
                         .getter(e -> e.getActorId() != null ? e.getActorId().toString() : "")
                         .editable(false)
@@ -68,7 +69,7 @@ public class LogsPanel extends JPanel {
         setLayout(new BorderLayout());
         JTable table = new JTable(model);
         model.configureTable(table);
-                JButton refreshButton = new JButton("Refresh");
+                JButton refreshButton = new JButton(I18n.get("btn.refresh"));
                 refreshButton.addActionListener(event -> refresh());
                 JPanel toolbar = new JPanel();
                 toolbar.add(refreshButton);

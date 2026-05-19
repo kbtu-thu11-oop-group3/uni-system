@@ -10,6 +10,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -41,7 +42,7 @@ public class EnrollmentsPanel extends JPanel {
         this.managerId = managerId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Enrollment, String>builder()
-                        .name("Student ID")
+                        .name(I18n.get("col.studentId"))
                         .type(String.class)
                         .getter(e -> e.getStudentId().toString())
                         .editable(false)
@@ -50,7 +51,7 @@ public class EnrollmentsPanel extends JPanel {
                         .build(),
 
                 Column.<Enrollment, String>builder()
-                        .name("Course ID")
+                        .name(I18n.get("col.courseId"))
                         .type(String.class)
                         .getter(e -> e.getCourseId().toString())
                         .editable(false)
@@ -59,7 +60,7 @@ public class EnrollmentsPanel extends JPanel {
                         .build(),
 
                 Column.<Enrollment, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(e -> e.getStatus().name())
                         .editable(false)
@@ -75,9 +76,9 @@ public class EnrollmentsPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JButton approveButton = new JButton("Approve");
-        JButton rejectButton = new JButton("Reject");
-        JButton refreshButton = new JButton("Refresh");
+        JButton approveButton = new JButton(I18n.get("btn.approve"));
+        JButton rejectButton = new JButton(I18n.get("btn.reject"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         approveButton.addActionListener(event -> approveSelected());
         rejectButton.addActionListener(event -> rejectSelected());

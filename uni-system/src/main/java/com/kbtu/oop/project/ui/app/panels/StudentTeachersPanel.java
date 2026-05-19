@@ -7,6 +7,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,7 +36,7 @@ public class StudentTeachersPanel extends JPanel {
         this.studentId = studentId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Teacher, String>builder()
-                        .name("Name")
+                        .name(I18n.get("col.name"))
                         .type(String.class)
                         .getter(Teacher::getFullName)
                         .editable(false)
@@ -44,7 +45,7 @@ public class StudentTeachersPanel extends JPanel {
                         .build(),
 
                 Column.<Teacher, String>builder()
-                        .name("Email")
+                        .name(I18n.get("col.email"))
                         .type(String.class)
                         .getter(Teacher::getEmail)
                         .editable(false)
@@ -53,7 +54,7 @@ public class StudentTeachersPanel extends JPanel {
                         .build(),
 
                 Column.<Teacher, String>builder()
-                        .name("Position")
+                        .name(I18n.get("col.position"))
                         .type(String.class)
                         .getter(t -> t.getPosition().name())
                         .editable(false)
@@ -74,9 +75,9 @@ public class StudentTeachersPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JButton clearFilter = new JButton("Clear Filter");
-        JButton rateButton = new JButton("Rate Teacher");
-        JButton refreshButton = new JButton("Refresh");
+        JButton clearFilter = new JButton(I18n.get("btn.clearFilter"));
+        JButton rateButton = new JButton(I18n.get("btn.rateTeacher"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         clearFilter.addActionListener(event -> {
             courseFilterId = null;
@@ -113,10 +114,10 @@ public class StudentTeachersPanel extends JPanel {
         JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
         JTextField rating = new JTextField();
 
-        form.add(new JLabel("Rating [1-5]"));
+        form.add(new JLabel(I18n.get("form.ratingRange")));
         form.add(rating);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Rate teacher",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.rateTeacher.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;
@@ -125,7 +126,7 @@ public class StudentTeachersPanel extends JPanel {
         try {
             int score = Integer.parseInt(rating.getText().trim());
             courseService.rateTeacher(studentId, teacher.getId(), score);
-            UiDialogs.showInfo(this, "Teacher rated");
+            UiDialogs.showInfo(this, I18n.get("msg.teacherRated"));
         } catch (Exception e) {
             UiDialogs.showError(this, e.getMessage());
         }

@@ -7,6 +7,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,7 +31,7 @@ public class ComplaintsManagementPanel extends JPanel {
         this.managerId = managerId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Complaint, String>builder()
-                        .name("Teacher")
+                        .name(I18n.get("col.teacher"))
                         .type(String.class)
                         .getter(c -> c.getSenderTeacherId() != null ? c.getSenderTeacherId().toString() : "")
                         .editable(false)
@@ -39,7 +40,7 @@ public class ComplaintsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(Complaint::getTitle)
                         .editable(false)
@@ -48,7 +49,7 @@ public class ComplaintsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Urgency")
+                        .name(I18n.get("col.urgency"))
                         .type(String.class)
                         .getter(c -> c.getUrgencyLevel().name())
                         .editable(false)
@@ -57,7 +58,7 @@ public class ComplaintsManagementPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(c -> c.getStatus().name())
                         .editable(false)
@@ -74,8 +75,8 @@ public class ComplaintsManagementPanel extends JPanel {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
         JComboBox<RequestStatus> statusCombo = new JComboBox<>(RequestStatus.values());
-        JButton updateButton = new JButton("Update Status");
-        JButton refreshButton = new JButton("Refresh");
+        JButton updateButton = new JButton(I18n.get("btn.updateStatus"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         updateButton.addActionListener(event -> updateSelected((RequestStatus) statusCombo.getSelectedItem()));
         refreshButton.addActionListener(event -> refresh());

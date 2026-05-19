@@ -7,6 +7,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -33,7 +34,7 @@ public class ComplaintsPanel extends JPanel {
         this.teacherId = teacherId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<Complaint, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(Complaint::getTitle)
                         .editable(false)
@@ -42,7 +43,7 @@ public class ComplaintsPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Urgency")
+                        .name(I18n.get("col.urgency"))
                         .type(String.class)
                         .getter(c -> c.getUrgencyLevel().name())
                         .editable(false)
@@ -51,7 +52,7 @@ public class ComplaintsPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(c -> c.getStatus().name())
                         .editable(false)
@@ -60,7 +61,7 @@ public class ComplaintsPanel extends JPanel {
                         .build(),
 
                 Column.<Complaint, String>builder()
-                        .name("Created")
+                        .name(I18n.get("col.created"))
                         .type(String.class)
                         .getter(c -> c.getCreatedAt().toString())
                         .editable(false)
@@ -76,11 +77,11 @@ public class ComplaintsPanel extends JPanel {
         JTable table = new JTable(model);
         model.configureTable(table);
 
-        JButton createButton = new JButton("Create Complaint");
+        JButton createButton = new JButton(I18n.get("btn.createComplaint"));
         createButton.addActionListener(event -> createComplaint());
 
         JPanel toolbar = new JPanel();
-        JButton refreshButton = new JButton("Refresh");
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
         refreshButton.addActionListener(event -> refresh());
         toolbar.add(createButton);
         toolbar.add(refreshButton);
@@ -101,16 +102,16 @@ public class ComplaintsPanel extends JPanel {
         JTextField description = new JTextField();
         JComboBox<UrgencyLevel> urgency = new JComboBox<>(UrgencyLevel.values());
 
-        form.add(new JLabel("Student IDs (comma)"));
+        form.add(new JLabel(I18n.get("form.studentIdsComma")));
         form.add(studentIds);
-        form.add(new JLabel("Title"));
+        form.add(new JLabel(I18n.get("col.title")));
         form.add(title);
-        form.add(new JLabel("Description"));
+        form.add(new JLabel(I18n.get("col.description")));
         form.add(description);
-        form.add(new JLabel("Urgency"));
+        form.add(new JLabel(I18n.get("col.urgency")));
         form.add(urgency);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Create complaint",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.createComplaint.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;

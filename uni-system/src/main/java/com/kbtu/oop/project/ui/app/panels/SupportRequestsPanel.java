@@ -8,6 +8,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,7 +38,7 @@ public class SupportRequestsPanel extends JPanel {
         this.specialistId = specialistId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<SupportRequest, String>builder()
-                        .name("Requester")
+                        .name(I18n.get("col.requester"))
                         .type(String.class)
                         .getter(r -> r.getRequesterId().toString())
                         .editable(false)
@@ -46,7 +47,7 @@ public class SupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Title")
+                        .name(I18n.get("col.title"))
                         .type(String.class)
                         .getter(SupportRequest::getTitle)
                         .editable(false)
@@ -55,7 +56,7 @@ public class SupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Description")
+                        .name(I18n.get("col.description"))
                         .type(String.class)
                         .getter(SupportRequest::getDescription)
                         .editable(false)
@@ -64,7 +65,7 @@ public class SupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Asset")
+                        .name(I18n.get("col.asset"))
                         .type(String.class)
                         .getter(SupportRequest::getAssetName)
                         .editable(false)
@@ -73,7 +74,7 @@ public class SupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Location")
+                        .name(I18n.get("col.location"))
                         .type(String.class)
                         .getter(SupportRequest::getLocation)
                         .editable(false)
@@ -82,7 +83,7 @@ public class SupportRequestsPanel extends JPanel {
                         .build(),
 
                 Column.<SupportRequest, String>builder()
-                        .name("Status")
+                        .name(I18n.get("col.status"))
                         .type(String.class)
                         .getter(r -> r.getStatus().name())
                         .editable(false)
@@ -99,8 +100,8 @@ public class SupportRequestsPanel extends JPanel {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
         JComboBox<RequestStatus> statusCombo = new JComboBox<>(RequestStatus.values());
-        JButton updateButton = new JButton("Update Status");
-        JButton refreshButton = new JButton("Refresh");
+        JButton updateButton = new JButton(I18n.get("btn.updateStatus"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         updateButton.addActionListener(event -> updateStatus((RequestStatus) statusCombo.getSelectedItem()));
         refreshButton.addActionListener(event -> refresh());

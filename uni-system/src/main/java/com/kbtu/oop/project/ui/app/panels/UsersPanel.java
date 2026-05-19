@@ -16,6 +16,7 @@ import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
 import com.kbtu.oop.project.ui.app.table.TableUtils;
+import com.kbtu.oop.project.util.I18n;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,7 +44,7 @@ public class UsersPanel extends JPanel {
         this.adminId = adminId;
         this.model = new GenericTableModel<>(List.of(
                 Column.<User, String>builder()
-                        .name("Role")
+                        .name(I18n.get("col.role"))
                         .type(String.class)
                         .getter(this::roleName)
                         .editable(false)
@@ -52,7 +53,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, String>builder()
-                        .name("Username")
+                        .name(I18n.get("col.username"))
                         .type(String.class)
                         .getter(User::getUsername)
                         .setter(User::setUsername)
@@ -62,7 +63,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, String>builder()
-                        .name("Email")
+                        .name(I18n.get("col.email"))
                         .type(String.class)
                         .getter(User::getEmail)
                         .setter(User::setEmail)
@@ -72,7 +73,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, String>builder()
-                        .name("First Name")
+                        .name(I18n.get("col.firstName"))
                         .type(String.class)
                         .getter(User::getFirstName)
                         .setter(User::setFirstName)
@@ -82,7 +83,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, String>builder()
-                        .name("Middle Name")
+                        .name(I18n.get("col.middleName"))
                         .type(String.class)
                         .getter(User::getMiddleName)
                         .setter(User::setMiddleName)
@@ -92,7 +93,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, String>builder()
-                        .name("Last Name")
+                        .name(I18n.get("col.lastName"))
                         .type(String.class)
                         .getter(User::getLastName)
                         .setter(User::setLastName)
@@ -102,7 +103,7 @@ public class UsersPanel extends JPanel {
                         .build(),
 
                 Column.<User, Boolean>builder()
-                        .name("Active")
+                        .name(I18n.get("col.active"))
                         .type(Boolean.class)
                         .getter(User::isActive)
                         .setter(User::setActive)
@@ -120,10 +121,10 @@ public class UsersPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel toolbar = new JPanel();
-        JButton addButton = new JButton("Add");
-        JButton deleteButton = new JButton("Delete");
-        JButton saveButton = new JButton("Save");
-        JButton refreshButton = new JButton("Refresh");
+        JButton addButton = new JButton(I18n.get("btn.add"));
+        JButton deleteButton = new JButton(I18n.get("btn.delete"));
+        JButton saveButton = new JButton(I18n.get("btn.save"));
+        JButton refreshButton = new JButton(I18n.get("btn.refresh"));
 
         addButton.addActionListener(event -> addUser());
         deleteButton.addActionListener(event -> deleteSelected());
@@ -155,22 +156,22 @@ public class UsersPanel extends JPanel {
         JComboBox<String> role = new JComboBox<>(
                 new String[] { "ADMIN", "MANAGER", "TEACHER", "STUDENT", "GRADUATE", "SUPPORT" });
 
-        form.add(new JLabel("Role"));
+        form.add(new JLabel(I18n.get("col.role")));
         form.add(role);
-        form.add(new JLabel("Username"));
+        form.add(new JLabel(I18n.get("col.username")));
         form.add(username);
-        form.add(new JLabel("Email"));
+        form.add(new JLabel(I18n.get("col.email")));
         form.add(email);
-        form.add(new JLabel("Password"));
+        form.add(new JLabel(I18n.get("form.password")));
         form.add(password);
-        form.add(new JLabel("First name"));
+        form.add(new JLabel(I18n.get("col.firstName")));
         form.add(firstName);
-        form.add(new JLabel("Middle name"));
+        form.add(new JLabel(I18n.get("col.middleName")));
         form.add(middleName);
-        form.add(new JLabel("Last name"));
+        form.add(new JLabel(I18n.get("col.lastName")));
         form.add(lastName);
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, "Create user",
+        int result = javax.swing.JOptionPane.showConfirmDialog(this, form, I18n.get("dialog.createUser.title"),
                 javax.swing.JOptionPane.OK_CANCEL_OPTION);
         if (result != javax.swing.JOptionPane.OK_OPTION) {
             return;
@@ -178,7 +179,7 @@ public class UsersPanel extends JPanel {
 
         User user = buildUser((String) role.getSelectedItem());
         if (user == null) {
-            UiDialogs.showError(this, "Unsupported role");
+            UiDialogs.showError(this, I18n.get("errors.unsupportedRole"));
             return;
         }
 

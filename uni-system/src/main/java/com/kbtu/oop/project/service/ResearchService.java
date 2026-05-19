@@ -30,9 +30,11 @@ import com.kbtu.oop.project.repository.impl.JsonResearchRepository;
 import com.kbtu.oop.project.repository.impl.JsonResearcherProfileRepository;
 import com.kbtu.oop.project.repository.impl.JsonUserRepository;
 import com.kbtu.oop.project.util.ActionLogger;
+import com.kbtu.oop.project.util.I18n;
 
 import java.util.Comparator;
 import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class ResearchService {
@@ -73,7 +75,7 @@ public class ResearchService {
     public boolean isResearcher(UUID userId) {
         try {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+                    .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", userId)));
             if (user instanceof Researcher)
                 return true;
             if (researcherProfileRepository.findByUserId(userId).isPresent())
@@ -101,7 +103,7 @@ public class ResearchService {
     public ResearchPaper publishPaper(UUID researcherId, UUID journalId, ResearchPaper paper) {
         Researcher researcher = resolveResearcher(researcherId);
         ResearchJournal journal = researchJournalRepository.findById(journalId)
-                .orElseThrow(() -> new NotFoundException("Journal not found: " + journalId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.journalNotFoundById", journalId)));
 
         ResearchPaper saved = researchRepository.save(paper);
         researcher.getResearchPaperIds().add(saved.getId());
@@ -109,15 +111,20 @@ public class ResearchService {
 
         notifyJournalSubscribers(journal, saved);
         newsService.announcePublishedPaper(researcherId, saved.getId());
+        try {
+            newsService.generateTopCitedResearcherNews(LocalDate.now().getYear());
+        } catch (Exception ignored) {
+            // No-op: top cited news requires enough data and should not block publishing.
+        }
         actionLogger.log(researcherId, "PUBLISH_PAPER", "Published paper " + saved.getId());
         return saved;
     }
 
     public void subscribeToJournal(UUID userId, UUID journalId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.userNotFoundById", userId)));
         ResearchJournal journal = researchJournalRepository.findById(journalId)
-                .orElseThrow(() -> new NotFoundException("Journal not found: " + journalId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.journalNotFoundById", journalId)));
         if (!journal.getSubscriberIds().contains(userId)) {
             journal.getSubscriberIds().add(userId);
             researchJournalRepository.save(journal);
@@ -128,7 +135,7 @@ public class ResearchService {
 
     public void unsubscribeFromJournal(UUID userId, UUID journalId) {
         ResearchJournal journal = researchJournalRepository.findById(journalId)
-                .orElseThrow(() -> new NotFoundException("Journal not found: " + journalId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.journalNotFoundById", journalId)));
         if (journal.getSubscriberIds().remove(userId)) {
             researchJournalRepository.save(journal);
         }
@@ -146,29 +153,42 @@ public class ResearchService {
         return saved;
     }
 
+    public ResearchJournal updateJournal(UUID managerId, ResearchJournal journal) {
+        ensureManager(managerId);
+        ResearchJournal saved = researchJournalRepository.save(journal);
+        actionLogger.log(managerId, "UPDATE_JOURNAL", "Updated journal " + saved.getId());
+        return saved;
+    }
+
+    public void deleteJournal(UUID managerId, UUID journalId) {
+        ensureManager(managerId);
+        researchJournalRepository.deleteById(journalId);
+        actionLogger.log(managerId, "DELETE_JOURNAL", "Deleted journal " + journalId);
+    }
+
     public void assignSupervisor(UUID graduateStudentId, UUID supervisorId) {
         User graduateCandidate = userRepository.findById(graduateStudentId)
-                .orElseThrow(() -> new NotFoundException("Graduate student not found: " + graduateStudentId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.graduateStudentNotFoundById", graduateStudentId)));
         if (!(graduateCandidate instanceof GraduateStudent graduateStudent)) {
-            throw new ResearchSupervisorException("Supervisor can be assigned only to graduate students");
+            throw new ResearchSupervisorException(I18n.get("errors.supervisorOnlyForGraduateStudents"));
         }
 
         User supervisorCandidate = userRepository.findById(supervisorId)
-                .orElseThrow(() -> new NotFoundException("Supervisor not found: " + supervisorId));
+                .orElseThrow(() -> new NotFoundException(I18n.getf("errors.supervisorNotFoundById", supervisorId)));
         if (!(supervisorCandidate instanceof Teacher teacher)) {
-            throw new ResearchSupervisorException("Assigned supervisor must be a professor");
+            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
         }
         if (teacher.getPosition() != TeacherPosition.PROFESSOR) {
-            throw new ResearchSupervisorException("Assigned supervisor must be a professor");
+            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
         }
 
         Researcher researcher = resolveResearcher(supervisorId);
         if (!(researcher instanceof Teacher)) {
-            throw new ResearchSupervisorException("Assigned supervisor must be a professor");
+            throw new ResearchSupervisorException(I18n.get("errors.assignedSupervisorMustBeProfessor"));
         }
         List<ResearchPaper> supervisorPapers = resolveResearchPapers(researcher);
         if (researcher.calculateHIndex(supervisorPapers) < 3) {
-            throw new ResearchSupervisorException("Research supervisor h-index must be at least 3");
+            throw new ResearchSupervisorException(I18n.get("errors.supervisorHIndexMin"));
         }
 
         graduateStudent.setSupervisorId(supervisorId);
@@ -213,6 +233,19 @@ public class ResearchService {
             researchProjectRepository.save(project);
         }
         actionLogger.log(researcherId, "JOIN_RESEARCH_PROJECT", "Joined project " + projectId);
+    }
+
+    public void leaveProject(UUID researcherId, UUID projectId) {
+        Researcher researcher = resolveResearcher(researcherId);
+        ResearchProject project = researchProjectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundException("Research project not found: " + projectId));
+        if (!project.getParticipantIds().contains(researcherId)) {
+            throw new ResearchProjectException("Researcher is not a project participant");
+        }
+        project.getParticipantIds().remove(researcherId);
+        project.getPublishedPaperIds().removeIf(paperId -> researcher.getResearchPaperIds().contains(paperId));
+        researchProjectRepository.save(project);
+        actionLogger.log(researcherId, "LEAVE_RESEARCH_PROJECT", "Left project " + projectId);
     }
 
     public void publishProjectPaper(UUID researcherId, UUID projectId, UUID paperId) {
