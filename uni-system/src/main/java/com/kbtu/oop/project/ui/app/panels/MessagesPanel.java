@@ -26,6 +26,7 @@ import javax.swing.JTextArea;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.SwingUtilities;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -44,9 +45,10 @@ public class MessagesPanel extends JPanel {
     private final GenericTableModel<Message> inboxModel;
     private final GenericTableModel<Message> outboxModel;
     private final List<User> recipients = new ArrayList<>();
+    private boolean recipientFilterUpdating;
     private JTable inboxTable;
     private JTable outboxTable;
-    private JComboBox<User> recipientSelector;
+    private JComboBox<String> recipientSelector;
     private JTextField subjectField;
     private JTextArea bodyArea;
 
@@ -184,10 +186,11 @@ public class MessagesPanel extends JPanel {
         c.gridy = 0;
         sendPanel.add(new JLabel(I18n.get("col.to")), c);
 
-        recipientSelector = new JComboBox<>(new DefaultComboBoxModel<>(recipients.toArray(new User[0])));
+        recipientSelector = new JComboBox<>(new DefaultComboBoxModel<>(recipients.stream()
+                .map(this::formatRecipient)
+                .toArray(String[]::new)));
         recipientSelector.setEditable(true);
-        recipientSelector.setRenderer((list, value, index, isSelected, cellHasFocus) ->
-                new JLabel(formatRecipient(value)));
+        recipientSelector.setRenderer((list, value, index, isSelected, cellHasFocus) -> new JLabel(value == null ? "" : value));
         installRecipientSearch(recipientSelector);
 
         c.gridx = 1;
@@ -231,7 +234,7 @@ public class MessagesPanel extends JPanel {
         recipients.sort((a, b) -> formatRecipient(a).compareToIgnoreCase(formatRecipient(b)));
     }
 
-    private void installRecipientSearch(JComboBox<User> comboBox) {
+    private void installRecipientSearch(JComboBox<String> comboBox) {
         JComponent editor = (JComponent) comboBox.getEditor().getEditorComponent();
         if (!(editor instanceof JTextField textField)) {
             return;
@@ -255,18 +258,30 @@ public class MessagesPanel extends JPanel {
     }
 
     private void filterRecipients(String query) {
-        String q = query == null ? "" : query.trim().toLowerCase();
-        DefaultComboBoxModel<User> filtered = new DefaultComboBoxModel<>();
-        for (User user : recipients) {
-            String name = formatRecipient(user).toLowerCase();
-            if (q.isBlank() || name.contains(q)) {
-                filtered.addElement(user);
-            }
+        if (recipientFilterUpdating) {
+            return;
         }
-        recipientSelector.setModel(filtered);
-        recipientSelector.setSelectedItem(null);
-        recipientSelector.getEditor().setItem(query);
-        recipientSelector.showPopup();
+        String q = query == null ? "" : query.trim().toLowerCase();
+        SwingUtilities.invokeLater(() -> {
+            recipientFilterUpdating = true;
+            try {
+                DefaultComboBoxModel<String> filtered = new DefaultComboBoxModel<>();
+                for (User user : recipients) {
+                    String name = formatRecipient(user);
+                    if (q.isBlank() || name.toLowerCase().contains(q)) {
+                        filtered.addElement(name);
+                    }
+                }
+                recipientSelector.setModel(filtered);
+                JTextField editorField = (JTextField) recipientSelector.getEditor().getEditorComponent();
+                editorField.setText(query);
+                if (filtered.getSize() > 0) {
+                    recipientSelector.showPopup();
+                }
+            } finally {
+                recipientFilterUpdating = false;
+            }
+        });
     }
 
     private String formatRecipient(User user) {
@@ -280,8 +295,8 @@ public class MessagesPanel extends JPanel {
 
     private void sendMessage() {
         try {
-            Object selected = recipientSelector.getSelectedItem();
-            if (!(selected instanceof User recipient)) {
+            User recipient = resolveSelectedRecipient();
+            if (recipient == null) {
                 UiDialogs.showError(this, "Please select recipient by name.");
                 return;
             }
@@ -294,6 +309,18 @@ public class MessagesPanel extends JPanel {
         } catch (Exception e) {
             UiDialogs.showError(this, e.getMessage());
         }
+    }
+
+    private User resolveSelectedRecipient() {
+        Object selected = recipientSelector.getSelectedItem();
+        String text = selected == null ? "" : selected.toString().trim();
+        if (text.isBlank()) {
+            return null;
+        }
+        return recipients.stream()
+                .filter(user -> formatRecipient(user).equalsIgnoreCase(text))
+                .findFirst()
+                .orElse(null);
     }
 
     private void refresh() {
