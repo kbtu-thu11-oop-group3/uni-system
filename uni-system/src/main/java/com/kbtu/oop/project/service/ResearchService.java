@@ -291,14 +291,17 @@ public class ResearchService {
     private Researcher resolveResearcher(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Researcher not found: " + userId));
-        if (!isEligibleResearcher(user)) {
-            throw new ResearchProjectException("User is not eligible to be a researcher: " + userId);
-        }
         if (user instanceof Researcher researcher) {
             return researcher;
         }
-        return researcherProfileRepository.findByUserId(userId)
-                .orElseGet(() -> createResearcherProfile(userId));
+        var existingProfile = researcherProfileRepository.findByUserId(userId);
+        if (existingProfile.isPresent()) {
+            return existingProfile.get();
+        }
+        if (!isEligibleResearcher(user)) {
+            throw new ResearchProjectException("User is not eligible to be a researcher: " + userId);
+        }
+        return createResearcherProfile(userId);
     }
 
     private void saveResearcher(UUID userId, Researcher researcher) {
