@@ -7,8 +7,8 @@ Desktop university management system (Java 17, Swing, Maven) developed as a team
 | #   | Full Name         | Role      | GitHub                                    |
 | --- | ----------------- | --------- | ----------------------------------------- |
 | 1   | Nurgali Nursultan | Team Lead | [aablty](https://github.com/aablty)       |
-| 2   | Aimurzayev Alan   | Member    | [baalausam](https://github.com/baalausam) |
-| 3   | Makmut Balaussa   | Member    | [Ne1vAlan](https://github.com/Ne1vAlan)   |
+| 2   | Aimurzayev Alan   | Member    | [Ne1vAlan](https://github.com/Ne1vAlan)   |
+| 3   | Makmut Balaussa   | Member    | [baalausam](https://github.com/baalausam) |
 
 ## Project Scope
 
