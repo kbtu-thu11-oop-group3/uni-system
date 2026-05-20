@@ -2,9 +2,7 @@ package com.kbtu.oop.project.ui.app.panels;
 
 import com.kbtu.oop.project.model.course.Course;
 import com.kbtu.oop.project.model.grade.Mark;
-import com.kbtu.oop.project.model.user.Student;
 import com.kbtu.oop.project.model.user.Teacher;
-import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.service.CourseService;
 import com.kbtu.oop.project.service.GradeService;
 import com.kbtu.oop.project.service.UserService;
