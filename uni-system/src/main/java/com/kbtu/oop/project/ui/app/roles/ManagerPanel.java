@@ -34,7 +34,7 @@ public class ManagerPanel extends JPanel {
         tabs.addTab("", new ReportsPanel(context.gradeService, context.courseService));
         tabs.addTab("", new ComplaintsManagementPanel(context.complaintService, manager.getId()));
         tabs.addTab("", new OrganizationsManagementPanel(context.studentOrganizationService, manager.getId()));
-        tabs.addTab("", new MessagesPanel(context.messageService, manager.getId()));
+        tabs.addTab("", new MessagesPanel(context.messageService, context.userService, manager.getId()));
         tabs.addTab("", new EmployeeSupportRequestsPanel(context.supportRequestService, manager.getId()));
         tabs.addTab("", new ResearchJournalsManagementPanel(context.researchService, manager.getId()));
         tabs.addTab("", new LessonsManagementPanel(context.scheduleService, context.courseService, context.userService,

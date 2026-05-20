@@ -19,7 +19,7 @@ public class SupportPanel extends JPanel {
 
         tabs.addTab("", new SupportRequestsPanel(context.userService, context.supportRequestService, specialist.getId()));
         tabs.addTab("", new NewsPanel(context.newsService, context.researchService, specialist.getId()));
-        tabs.addTab("", new MessagesPanel(context.messageService, specialist.getId()));
+        tabs.addTab("", new MessagesPanel(context.messageService, context.userService, specialist.getId()));
         applyTranslations();
         I18n.addListener(this::applyTranslations);
 

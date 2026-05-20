@@ -32,9 +32,9 @@ public class TeacherPanel extends JPanel {
         tabs.addTab("", new StudentsPanel(context.userService));
         tabs.addTab("", new ComplaintsPanel(context.complaintService, teacher.getId()));
         tabs.addTab("", new NewsPanel(context.newsService, context.researchService, teacher.getId()));
-        tabs.addTab("", new MessagesPanel(context.messageService, teacher.getId()));
+        tabs.addTab("", new MessagesPanel(context.messageService, context.userService, teacher.getId()));
         tabs.addTab("", new EmployeeSupportRequestsPanel(context.supportRequestService, teacher.getId()));
-        tabs.addTab("", new TeacherLessonsPanel(context.scheduleService, teacher.getId()));
+        tabs.addTab("", new TeacherLessonsPanel(context.scheduleService, context.courseService, teacher.getId()));
 
         if (showResearchTab) {
             tabs.addTab("", new ResearchPanel(context.researchService, teacher.getId()));

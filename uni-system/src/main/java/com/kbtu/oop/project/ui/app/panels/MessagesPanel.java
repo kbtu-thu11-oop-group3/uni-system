@@ -1,7 +1,10 @@
 package com.kbtu.oop.project.ui.app.panels;
 
 import com.kbtu.oop.project.model.communication.Message;
+import com.kbtu.oop.project.model.user.Employee;
+import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.service.MessageService;
+import com.kbtu.oop.project.service.UserService;
 import com.kbtu.oop.project.ui.app.UiDialogs;
 import com.kbtu.oop.project.ui.app.table.Column;
 import com.kbtu.oop.project.ui.app.table.GenericTableModel;
@@ -16,23 +19,40 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JTabbedPane;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
+import javax.swing.BorderFactory;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
 
 public class MessagesPanel extends JPanel {
 
     private final MessageService messageService;
+    private final UserService userService;
     private final UUID senderId;
     private final GenericTableModel<Message> inboxModel;
     private final GenericTableModel<Message> outboxModel;
+    private final List<User> recipients = new ArrayList<>();
     private JTable inboxTable;
     private JTable outboxTable;
+    private JComboBox<User> recipientSelector;
+    private JTextField subjectField;
+    private JTextArea bodyArea;
 
-    public MessagesPanel(MessageService messageService, UUID senderId) {
+    public MessagesPanel(MessageService messageService, UserService userService, UUID senderId) {
     this.messageService = messageService;
+    this.userService = userService;
     this.senderId = senderId;
     this.inboxModel = new GenericTableModel<>(List.of(
         Column.<Message, String>builder()
@@ -117,38 +137,20 @@ public class MessagesPanel extends JPanel {
         outboxTable = new JTable(outboxModel);
         outboxModel.configureTable(outboxTable);
 
-        JPanel sendPanel = new JPanel(new GridLayout(0, 2, 6, 6));
-        JTextField recipientId = new JTextField();
-        JTextField subject = new JTextField();
-        JTextField body = new JTextField();
-
-        sendPanel.add(new JLabel(I18n.get("form.recipientId")));
-        sendPanel.add(recipientId);
-        sendPanel.add(new JLabel(I18n.get("col.subject")));
-        sendPanel.add(subject);
-        sendPanel.add(new JLabel(I18n.get("col.body")));
-        sendPanel.add(body);
+        loadRecipients();
+        JPanel sendPanel = buildSendPanel();
 
         JButton markReadButton = new JButton(I18n.get("btn.markRead"));
         JButton sendButton = new JButton(I18n.get("btn.send"));
-        sendButton.addActionListener(event -> {
-            try {
-                messageService.sendEmployeeMessage(senderId, UUID.fromString(recipientId.getText().trim()),
-                        subject.getText().trim(), body.getText().trim());
-                recipientId.setText("");
-                subject.setText("");
-                body.setText("");
-                refresh();
-            } catch (Exception e) {
-                UiDialogs.showError(this, e.getMessage());
-            }
-        });
+        sendButton.addActionListener(event -> sendMessage());
 
         markReadButton.addActionListener(event -> markSelectedRead());
 
         JPanel bottom = new JPanel(new BorderLayout());
         bottom.add(sendPanel, BorderLayout.CENTER);
-        bottom.add(sendButton, BorderLayout.EAST);
+        JPanel sendButtonWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        sendButtonWrap.add(sendButton);
+        bottom.add(sendButtonWrap, BorderLayout.SOUTH);
 
         JPanel inboxWrapper = new JPanel(new BorderLayout());
         JPanel inboxToolbar = new JPanel();
@@ -169,6 +171,129 @@ public class MessagesPanel extends JPanel {
 
         add(tabs, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
+    }
+
+    private JPanel buildSendPanel() {
+        JPanel sendPanel = new JPanel(new GridBagLayout());
+        sendPanel.setBorder(BorderFactory.createTitledBorder(I18n.get("btn.send")));
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 6, 4, 6);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+        sendPanel.add(new JLabel(I18n.get("col.to")), c);
+
+        recipientSelector = new JComboBox<>(new DefaultComboBoxModel<>(recipients.toArray(new User[0])));
+        recipientSelector.setEditable(true);
+        recipientSelector.setRenderer((list, value, index, isSelected, cellHasFocus) ->
+                new JLabel(formatRecipient(value)));
+        installRecipientSearch(recipientSelector);
+
+        c.gridx = 1;
+        c.weightx = 1;
+        sendPanel.add(recipientSelector, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        sendPanel.add(new JLabel(I18n.get("col.subject")), c);
+
+        subjectField = new JTextField();
+        c.gridx = 1;
+        c.weightx = 1;
+        sendPanel.add(subjectField, c);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weightx = 0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        sendPanel.add(new JLabel(I18n.get("col.body")), c);
+
+        bodyArea = new JTextArea(3, 30);
+        bodyArea.setLineWrap(true);
+        bodyArea.setWrapStyleWord(true);
+        JScrollPane bodyScroll = new JScrollPane(bodyArea);
+        c.gridx = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.BOTH;
+        sendPanel.add(bodyScroll, c);
+        return sendPanel;
+    }
+
+    private void loadRecipients() {
+        recipients.clear();
+        for (User user : userService.findAll()) {
+            if (user instanceof Employee && !senderId.equals(user.getId()) && user.isActive()) {
+                recipients.add(user);
+            }
+        }
+        recipients.sort((a, b) -> formatRecipient(a).compareToIgnoreCase(formatRecipient(b)));
+    }
+
+    private void installRecipientSearch(JComboBox<User> comboBox) {
+        JComponent editor = (JComponent) comboBox.getEditor().getEditorComponent();
+        if (!(editor instanceof JTextField textField)) {
+            return;
+        }
+        textField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterRecipients(textField.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterRecipients(textField.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterRecipients(textField.getText());
+            }
+        });
+    }
+
+    private void filterRecipients(String query) {
+        String q = query == null ? "" : query.trim().toLowerCase();
+        DefaultComboBoxModel<User> filtered = new DefaultComboBoxModel<>();
+        for (User user : recipients) {
+            String name = formatRecipient(user).toLowerCase();
+            if (q.isBlank() || name.contains(q)) {
+                filtered.addElement(user);
+            }
+        }
+        recipientSelector.setModel(filtered);
+        recipientSelector.setSelectedItem(null);
+        recipientSelector.getEditor().setItem(query);
+        recipientSelector.showPopup();
+    }
+
+    private String formatRecipient(User user) {
+        if (user == null) {
+            return "";
+        }
+        String fullName = user.getFullName() == null ? "" : user.getFullName().trim();
+        String email = user.getEmail() == null ? "" : user.getEmail().trim();
+        return email.isBlank() ? fullName : fullName + " (" + email + ")";
+    }
+
+    private void sendMessage() {
+        try {
+            Object selected = recipientSelector.getSelectedItem();
+            if (!(selected instanceof User recipient)) {
+                UiDialogs.showError(this, "Please select recipient by name.");
+                return;
+            }
+            messageService.sendEmployeeMessage(senderId, recipient.getId(),
+                    subjectField.getText().trim(), bodyArea.getText().trim());
+            subjectField.setText("");
+            bodyArea.setText("");
+            recipientSelector.setSelectedItem(null);
+            refresh();
+        } catch (Exception e) {
+            UiDialogs.showError(this, e.getMessage());
+        }
     }
 
     private void refresh() {

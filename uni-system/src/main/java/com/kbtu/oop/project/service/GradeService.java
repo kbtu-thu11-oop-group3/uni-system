@@ -75,7 +75,7 @@ public class GradeService {
         if (firstAttestation < 0 || firstAttestation > 60) {
             throw new ValidationException(I18n.get("errors.firstAttestationRange"));
         }
-        Mark mark = findMarkByStudentAndCourse(studentId, courseId);
+        Mark mark = findOrCreateMark(teacherId, studentId, courseId);
         double secondAttestation = mark.getSecondAttestation() != null ? mark.getSecondAttestation() : 0;
         if (firstAttestation + secondAttestation > 60) {
             throw new ValidationException(I18n.get("errors.attestationSumRange"));
@@ -92,7 +92,7 @@ public class GradeService {
         if (secondAttestation < 0 || secondAttestation > 60) {
             throw new ValidationException(I18n.get("errors.secondAttestationRange"));
         }
-        Mark mark = findMarkByStudentAndCourse(studentId, courseId);
+        Mark mark = findOrCreateMark(teacherId, studentId, courseId);
         double firstAttestation = mark.getFirstAttestation() != null ? mark.getFirstAttestation() : 0;
         if (firstAttestation + secondAttestation > 60) {
             throw new ValidationException(I18n.get("errors.attestationSumRange"));
@@ -109,7 +109,7 @@ public class GradeService {
         if (finalExam < 0 || finalExam > 40) {
             throw new ValidationException(I18n.get("errors.finalExamRange"));
         }
-        Mark mark = findMarkByStudentAndCourse(studentId, courseId);
+        Mark mark = findOrCreateMark(teacherId, studentId, courseId);
         double firstAttestation = mark.getFirstAttestation() != null ? mark.getFirstAttestation() : 0;
         double secondAttestation = mark.getSecondAttestation() != null ? mark.getSecondAttestation() : 0;
         double total = firstAttestation + secondAttestation + finalExam;
@@ -130,6 +130,24 @@ public class GradeService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(
                         I18n.getf("errors.markNotFoundByStudentCourse", studentId, courseId)));
+    }
+
+    private Mark findOrCreateMark(UUID teacherId, UUID studentId, UUID courseId) {
+        return gradeRepository.findAll().stream()
+                .filter(mark -> mark.getStudentId().equals(studentId) && mark.getCourseId().equals(courseId))
+                .findFirst()
+                .orElseGet(() -> {
+                    userRepository.findById(studentId)
+                            .filter(Student.class::isInstance)
+                            .orElseThrow(() -> new NotFoundException(I18n.getf("errors.studentNotFoundById", studentId)));
+                    courseRepository.findById(courseId)
+                            .orElseThrow(() -> new NotFoundException(I18n.getf("errors.courseNotFoundById", courseId)));
+                    Mark mark = new Mark();
+                    mark.setTeacherId(teacherId);
+                    mark.setStudentId(studentId);
+                    mark.setCourseId(courseId);
+                    return mark;
+                });
     }
 
     public List<Mark> getStudentTranscript(UUID studentId) {

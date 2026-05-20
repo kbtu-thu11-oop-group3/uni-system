@@ -22,7 +22,7 @@ public class AdminPanel extends JPanel {
         tabs.addTab("", new UsersPanel(context.userService, admin.getId()));
         tabs.addTab("", new LogsPanel());
         tabs.addTab("", new NewsPanel(context.newsService, context.researchService, admin.getId()));
-        tabs.addTab("", new MessagesPanel(context.messageService, admin.getId()));
+        tabs.addTab("", new MessagesPanel(context.messageService, context.userService, admin.getId()));
         tabs.addTab("", new EmployeeSupportRequestsPanel(context.supportRequestService, admin.getId()));
         applyTranslations();
         I18n.addListener(this::applyTranslations);

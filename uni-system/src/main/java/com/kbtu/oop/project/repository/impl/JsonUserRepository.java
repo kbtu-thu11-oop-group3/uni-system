@@ -146,6 +146,25 @@ public class JsonUserRepository implements UserRepository {
                 g.setStudentType(
                         com.kbtu.oop.project.model.common.StudentType.valueOf(node.get("studentType").asText()));
             }
+            g.setStudentCode(getText(node, "studentCode"));
+            if (node.hasNonNull("school")) {
+                g.setSchool(com.kbtu.oop.project.model.common.School.valueOf(node.get("school").asText()));
+            } else if (node.hasNonNull("major")) {
+                try {
+                    g.setSchool(com.kbtu.oop.project.model.common.School
+                            .valueOf(node.get("major").asText().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    g.setSchool(com.kbtu.oop.project.model.common.School.SEPI);
+                }
+            }
+            if (node.hasNonNull("yearOfStudy"))
+                g.setYearOfStudy(node.get("yearOfStudy").asInt());
+            if (node.hasNonNull("credits"))
+                g.setCredits(node.get("credits").asInt());
+            if (node.hasNonNull("gpa"))
+                g.setGpa(node.get("gpa").asDouble());
+            if (node.hasNonNull("failedAttempts"))
+                g.setFailedAttempts(node.get("failedAttempts").asInt());
             if (node.has("enrolledCourseIds")) {
                 for (JsonNode idNode : node.get("enrolledCourseIds")) {
                     g.getEnrolledCourseIds().add(UUID.fromString(idNode.asText()));

@@ -1,7 +1,10 @@
 package com.kbtu.oop.project.ui.app.panels;
 
+import com.kbtu.oop.project.model.course.Course;
 import com.kbtu.oop.project.model.grade.Mark;
+import com.kbtu.oop.project.model.user.Student;
 import com.kbtu.oop.project.model.user.Teacher;
+import com.kbtu.oop.project.model.user.User;
 import com.kbtu.oop.project.service.CourseService;
 import com.kbtu.oop.project.service.GradeService;
 import com.kbtu.oop.project.service.UserService;
@@ -24,7 +27,10 @@ import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class GradesPanel extends JPanel {
@@ -35,7 +41,7 @@ public class GradesPanel extends JPanel {
     private final UUID teacherId;
     private final GenericTableModel<Mark> model;
     private final JTable table;
-    private UUID courseFilterId;
+    private Course selectedCourseFilter;
 
     public GradesPanel(GradeService gradeService, CourseService courseService, UserService userService, UUID teacherId) {
         this.gradeService = gradeService;
@@ -105,24 +111,17 @@ public class GradesPanel extends JPanel {
     private void buildUi() {
         setLayout(new BorderLayout());
         JPanel toolbar = new JPanel();
-        JComboBox<String> courseFilter = new JComboBox<>();
-        courseFilter.addItem(I18n.get("filter.allCourses"));
+        JComboBox<Course> courseFilter = new JComboBox<>();
+        courseFilter.addItem(null);
         Teacher teacher = (Teacher) userService.findById(teacherId);
         for (UUID courseId : teacher.getCourseIds()) {
             var course = courseService.findById(courseId);
-            courseFilter.addItem(course.getCode() + " | " + course.getTitle());
+            courseFilter.addItem(course);
         }
+        courseFilter.setRenderer((list, value, index, isSelected, cellHasFocus) -> new JLabel(
+                value == null ? I18n.get("filter.allCourses") : value.getCode() + " | " + value.getTitle()));
         courseFilter.addActionListener(event -> {
-            int index = courseFilter.getSelectedIndex();
-            if (index <= 0) {
-                courseFilterId = null;
-            } else {
-                String selected = (String) courseFilter.getSelectedItem();
-                if (selected != null) {
-                    String id = selected.split("\\|")[0].trim();
-                    courseFilterId = UUID.fromString(id);
-                }
-            }
+            selectedCourseFilter = (Course) courseFilter.getSelectedItem();
             refresh();
         });
         JButton setFirst = new JButton(I18n.get("btn.setFirst"));
@@ -167,18 +166,34 @@ public class GradesPanel extends JPanel {
     }
 
     private void refresh() {
-        List<Mark> marks = gradeService.findAll();
         Teacher teacher = (Teacher) userService.findById(teacherId);
         List<UUID> teacherCourses = teacher.getCourseIds();
-        marks = marks.stream()
-            .filter(mark -> teacherCourses.contains(mark.getCourseId()))
-            .toList();
-        if (courseFilterId != null) {
-            marks = marks.stream()
-                .filter(mark -> courseFilterId.equals(mark.getCourseId()))
-                .toList();
+        Map<String, Mark> existingMarks = new HashMap<>();
+        for (Mark mark : gradeService.findAll()) {
+            existingMarks.put(key(mark.getStudentId(), mark.getCourseId()), mark);
         }
-        model.setRows(marks);
+
+        LinkedHashMap<String, Mark> rows = new LinkedHashMap<>();
+        for (UUID courseId : teacherCourses) {
+            if (selectedCourseFilter != null && !selectedCourseFilter.getId().equals(courseId)) {
+                continue;
+            }
+            Course course = courseService.findById(courseId);
+            for (UUID studentId : course.getStudentIds()) {
+                String key = key(studentId, courseId);
+                Mark existing = existingMarks.get(key);
+                if (existing != null) {
+                    rows.put(key, existing);
+                } else {
+                    Mark placeholder = new Mark();
+                    placeholder.setTeacherId(teacherId);
+                    placeholder.setStudentId(studentId);
+                    placeholder.setCourseId(courseId);
+                    rows.put(key, placeholder);
+                }
+            }
+        }
+        model.setRows(rows.values().stream().toList());
     }
 
     private void updateMark(String type) {
@@ -216,5 +231,9 @@ public class GradesPanel extends JPanel {
         } catch (Exception e) {
             UiDialogs.showError(this, e.getMessage());
         }
+    }
+
+    private String key(UUID studentId, UUID courseId) {
+        return studentId + "|" + courseId;
     }
 }
